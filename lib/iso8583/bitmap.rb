@@ -54,7 +54,12 @@ module ISO8583
     def unset(i)
       self[i] = false
     end
-
+    
+    # Generate the hex values representing this bitmap.
+    def to_hex
+      "%02x" % self.to_s.to_i(2)
+    end
+    
     # Generate the bytes representing this bitmap.
     def to_bytes
       arr = [self.to_s]

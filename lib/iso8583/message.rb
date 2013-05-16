@@ -111,14 +111,18 @@ module ISO8583
 
     # The value of the MTI (Message Type Indicator) of this message.
     attr_reader :mti 
-
+    
+    # ISO8583 allows hex or binary bitmap, so it should be configurable
+    attr_reader :use_hex_bitmap
+    
     # Instantiate a new instance of this type of Message
     # optionally specifying an mti. 
-    def initialize(mti = nil)
+    def initialize(mti = nil, use_hex_bitmap = false)
       # values is an internal field used to collect all the
       # bmp number | bmp name | field en/decoders | values
       # which are set in this message.
       @values = {}
+      @use_hex_bitmap = use_hex_bitmap
       self.mti = mti if mti
     end
 
@@ -204,7 +208,7 @@ module ISO8583
         enc_value = @values[bmp_num].encode
         message << enc_value
       end
-      [ bitmap.to_bytes, message ]
+      [ use_hex_bitmap ? bitmap.to_hex : bitmap.to_bytes, message ]
     end
 
     def _get_definition(key) #:nodoc:
