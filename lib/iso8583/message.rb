@@ -348,9 +348,15 @@ module ISO8583
         message.mti, rest = _mti_format.parse(str)
         bmp,rest = Bitmap.parse(rest)
         bmp.each {|bit|
-          bmp_def      = _definitions[bit]
-          value, rest  = bmp_def.field.parse(rest)
-          message[bit] = value
+          if( bit != 1)
+            bmp_def = _definitions[bit]
+            if bmp_def.respond_to?("field")
+              value, rest  = bmp_def.field.parse(rest)
+            else
+              raise ISO8583Exception.new( "bit mask defined the use of element \##{bit}, but in the ISO8583::Message class, used it is not defined for that bit number" )
+            end
+            message[bit] = value
+          end
         }
         message
       end

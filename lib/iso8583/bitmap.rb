@@ -92,13 +92,14 @@ module ISO8583
     private
 
     def initialize_from_message(message)
-      bmp = message.unpack("B64")[0]
+      bmp = message.use_hex_bitmap ? message[0..15].hex.to_s(2).rjust(64, '0') : message.unpack("B64")[0]
+              
       if bmp[0,1] == "1"
-        bmp = message.unpack("B128")[0]
+        bmp = message.use_hex_bitmap ? message[0..31].hex.to_s(2).rjust(128,'0') : message.unpack("B128")[0]
       end
 
-      0.upto(bmp.length-1) do |i|
-        @bmp[i] = (bmp[i,1] == "1")
+      0.upto(bmp.length - 1) do |i|
+        @bmp[i] = (bmp[i, 1] == "1")
       end
     end
 
@@ -107,16 +108,19 @@ module ISO8583
       # after the bitmap is taken away.
       def parse(str)
         bmp  = Bitmap.new(str)
-        rest = bmp[1] ? str[16, str.length] : str[8, str.length]
-        [ bmp, rest ]
+        rest = if str.use_hex_bitmap
+          bmp[1] ? str[32, str.length] : str[16, str.length]
+        else
+          bmp[1] ? str[16, str.length] : str[8, str.length]
+        [bmp, rest]
       end
     end
     
   end
 end
 
-if __FILE__==$0
+if __FILE__ == $0
   mp = ISO8583::Bitmap.new
-  20.step(128,7) {|i| mp.set(i)}
+  20.step(128, 7) { |i| mp.set(i) }
   print mp.to_bytes
 end
