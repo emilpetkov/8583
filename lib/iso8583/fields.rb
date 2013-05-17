@@ -67,7 +67,12 @@ module ISO8583
   LLLVAR_N        = Field.new
   LLLVAR_N.length = LLL
   LLLVAR_N.codec  = ASCII_Number
-
+  
+  # Three byte variable length ASCII numeral
+  LLLVAR_AN        = Field.new
+  LLLVAR_AN.length = LLL
+  LLLVAR_AN.codec  = AN_Codec
+  
   # Two byte variable length ASCII numeral, payload Track2 data
   LLVAR_Z         = Field.new
   LLVAR_Z.length  = LL
@@ -161,5 +166,13 @@ module ISO8583
   YYMM        = Field.new
   YYMM.codec  = YYMMCodec
   YYMM.length = 4
+  
+  # fields patch
+  HHMMSS        = Field.new
+  HHMMSS.codec  = HHMMSSCodec
+  HHMMSS.length = 4
 
+  MMDD        = Field.new
+  MMDD.codec  = MMDDCodec
+  MMDD.length = 4
 end
