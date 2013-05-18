@@ -91,11 +91,11 @@ module ISO8583
 
     private
 
-    def initialize_from_message(message)
-      bmp = message.use_hex_bitmap ? message[0..15].hex.to_s(2).rjust(64, '0') : message.unpack("B64")[0]
+    def initialize_from_message(message, use_hex_bitmap = false)
+      bmp = use_hex_bitmap ? message[0..15].hex.to_s(2).rjust(64, '0') : message.unpack("B64")[0]
               
       if bmp[0,1] == "1"
-        bmp = message.use_hex_bitmap ? message[0..31].hex.to_s(2).rjust(128,'0') : message.unpack("B128")[0]
+        bmp = use_hex_bitmap ? message[0..31].hex.to_s(2).rjust(128,'0') : message.unpack("B128")[0]
       end
 
       0.upto(bmp.length - 1) do |i|
@@ -106,12 +106,13 @@ module ISO8583
     class << self
       # Parse the bytes in string and return the Bitmap and bytes remaining in `str`
       # after the bitmap is taken away.
-      def parse(str)
+      def parse(str, use_hex_bitmap = false)
         bmp  = Bitmap.new(str)
-        rest = if str.use_hex_bitmap
-          bmp[1] ? str[32, str.length] : str[16, str.length]
-        else
-          bmp[1] ? str[16, str.length] : str[8, str.length]
+        rest = if use_hex_bitmap
+                 bmp[1] ? str[32, str.length] : str[16, str.length]
+               else
+                 bmp[1] ? str[16, str.length] : str[8, str.length]
+               end
         [bmp, rest]
       end
     end

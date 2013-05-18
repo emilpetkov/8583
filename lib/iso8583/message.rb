@@ -343,10 +343,10 @@ module ISO8583
       end
       
       # Parse the bytes `str` returning a message of the defined type.
-      def parse(str)
+      def parse(str, use_hex_bitmap = false)
         message = self.new
         message.mti, rest = _mti_format.parse(str)
-        bmp,rest = Bitmap.parse(rest)
+        bmp, rest = Bitmap.parse(rest, use_hex_bitmap)
         bmp.each {|bit|
           if( bit != 1)
             bmp_def = _definitions[bit]
