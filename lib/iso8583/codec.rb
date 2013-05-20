@@ -159,7 +159,7 @@ module ISO8583
     # SC: 3 digits or =
     # ES = ?
     # lrc : 1byte
-    raise ISO8583Exception.new("Invalid Track2 data: #{track2}") unless track2 =~ /^;*(\d{9,19})=(.*)\?.$/
+    raise ISO8583Exception.new("Invalid Track2 data: #{track2}") unless track2 =~ /^(\d{9,19})=(.*).$/
     track2
   }
   Track2.decoder = PASS_THROUGH_DECODER
