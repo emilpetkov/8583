@@ -201,7 +201,7 @@ module ISO8583
     # Returns an array of two byte arrays:
     # [bitmap_bytes, message_bytes]
     def _body
-      bitmap  = Bitmap.new #(nil, use_hex_bitmap)
+      bitmap  = Bitmap.new
       message = ""
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
@@ -347,16 +347,11 @@ module ISO8583
         message = self.new(nil, use_hex_bitmap)
         message.mti, rest = _mti_format.parse(str)
         bmp, rest = Bitmap.parse(rest, use_hex_bitmap)
-        bmp.each {|bit|
-          if( bit != 1)
-            bmp_def = _definitions[bit]
-            if bmp_def.respond_to?("field")
-              value, rest  = bmp_def.field.parse(rest)
-            else
-              raise ISO8583Exception.new( "bit mask defined the use of element \##{bit}, but in the ISO8583::Message class, used it is not defined for that bit number" )
-            end
-            message[bit] = value
-          end
+        bmp.each { |bit|
+          next if bit == 1
+          bmp_def      = _definitions[bit]
+          value, rest  = bmp_def.field.parse(rest)
+          message[bit] = value
         }
         message
       end
