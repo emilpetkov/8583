@@ -94,7 +94,9 @@ module ISO8583
   PASS_THROUGH_DECODER = lambda{|str|
     str.strip # remove padding
   }
-
+  
+  NO_MODIFICATIONS_DECODER = lambda { |str| str }
+  
   # Takes a number or str representation of a number and BCD encodes it, e.g.
   # "1234" => "\x12\x34"
   # 3456   => "\x34\x56"
@@ -137,7 +139,7 @@ module ISO8583
     raise ISO8583Exception.new("Invalid value: #{str} must be [\x20-\x7E]") unless str =~ /^[\x20-\x7E]*$/
     str
   }
-  ANS_Codec.decoder = PASS_THROUGH_DECODER
+  ANS_Codec.decoder = NO_MODIFICATIONS_DECODER
 
   Null_Codec = Codec.new
   Null_Codec.encoder = lambda {|str|
