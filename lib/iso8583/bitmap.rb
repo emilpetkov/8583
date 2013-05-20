@@ -15,12 +15,12 @@ module ISO8583
     # create a new Bitmap object. In case an iso message
     # is passed in, that messages bitmap will be parsed. If
     # not, this initializes and empty bitmap.
-    def initialize(message = nil)
+    def initialize(message = nil, use_hex_bitmap = false)
       @bmp = Array.new(128, false)
       if !message
 
       else
-        initialize_from_message message
+        initialize_from_message(message, use_hex_bitmap)
       end
     end
     
@@ -93,7 +93,6 @@ module ISO8583
 
     def initialize_from_message(message, use_hex_bitmap = false)
       bmp = use_hex_bitmap ? message[0..15].hex.to_s(2).rjust(64, '0') : message.unpack("B64")[0]
-              
       if bmp[0,1] == "1"
         bmp = use_hex_bitmap ? message[0..31].hex.to_s(2).rjust(128,'0') : message.unpack("B128")[0]
       end
@@ -107,7 +106,7 @@ module ISO8583
       # Parse the bytes in string and return the Bitmap and bytes remaining in `str`
       # after the bitmap is taken away.
       def parse(str, use_hex_bitmap = false)
-        bmp  = Bitmap.new(str)
+        bmp  = Bitmap.new(str, use_hex_bitmap)
         rest = if use_hex_bitmap
                  bmp[1] ? str[32, str.length] : str[16, str.length]
                else

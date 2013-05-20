@@ -201,7 +201,7 @@ module ISO8583
     # Returns an array of two byte arrays:
     # [bitmap_bytes, message_bytes]
     def _body
-      bitmap  = Bitmap.new
+      bitmap  = Bitmap.new #(nil, use_hex_bitmap)
       message = ""
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
@@ -344,7 +344,7 @@ module ISO8583
       
       # Parse the bytes `str` returning a message of the defined type.
       def parse(str, use_hex_bitmap = false)
-        message = self.new
+        message = self.new(nil, use_hex_bitmap)
         message.mti, rest = _mti_format.parse(str)
         bmp, rest = Bitmap.parse(rest, use_hex_bitmap)
         bmp.each {|bit|
