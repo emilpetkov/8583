@@ -350,7 +350,11 @@ module ISO8583
         bmp.each { |bit|
           next if bit == 1
           bmp_def      = _definitions[bit]
-          value, rest  = bmp_def.field.parse(rest)
+          if bmp_def && bmp_def.respond_to?('field')
+              value, rest  = bmp_def.field.parse(rest)
+          else
+            raise ISO8583Exception.new( "bit mask defined the use of element \##{bit}, but in the ISO8583::Message class, used it is not defined for that bit number" )
+          end
           message[bit] = value
         }
         message
