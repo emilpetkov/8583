@@ -57,7 +57,12 @@ module ISO8583
     
     # Generate the hex values representing this bitmap.
     def to_hex
-      "%02x" % self.to_s.to_i(2)
+      hex_message_len = if self[1]
+        128/4
+      else
+        64/4
+      end
+      ("%02x" % self.to_s.to_i(2)).rjust( hex_message_len, '0' ) # fill the message with padding zeros, when message low values does not exist
     end
     
     # Generate the bytes representing this bitmap.
