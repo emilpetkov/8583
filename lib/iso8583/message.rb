@@ -115,6 +115,8 @@ module ISO8583
     # ISO8583 allows hex or binary bitmap, so it should be configurable
     attr_reader :use_hex_bitmap
     
+    attr_reader :parsed_raw_values
+
     # Instantiate a new instance of this type of Message
     # optionally specifying an mti. 
     def initialize(mti = nil, use_hex_bitmap = false)
@@ -122,6 +124,7 @@ module ISO8583
       # bmp number | bmp name | field en/decoders | values
       # which are set in this message.
       @values = {}
+      @parsed_raw_values = {}
       @use_hex_bitmap = use_hex_bitmap
       self.mti = mti if mti
     end
@@ -192,6 +195,10 @@ module ISO8583
         str += ("%03d %#{_max_name}s : %s\n" % [bmp_num, _bmp.name, _bmp.value])
       }
       str
+    end
+
+    def raw_value( key )
+      @parsed_raw_values[ key ]
     end
 
 
@@ -351,7 +358,8 @@ module ISO8583
           next if bit == 1
           bmp_def      = _definitions[bit]
           if bmp_def && bmp_def.respond_to?('field')
-              value, rest  = bmp_def.field.parse(rest)
+              value, rest, raw = bmp_def.field.parse_ex(rest)
+              message.parsed_raw_values[bit] = raw
           else
             raise ISO8583Exception.new( "bit mask defined the use of element \##{bit}, but in the ISO8583::Message class, used it is not defined for that bit number" )
           end

@@ -18,6 +18,11 @@ module ISO8583
     end
 
     def parse(raw)
+      real_value, rest, raw_value = parse_ex( raw )
+      [ real_value, rest ]
+    end
+
+    def parse_ex(raw)
       len, raw = case length
                  when Fixnum
                    [length, raw]
@@ -42,7 +47,7 @@ module ISO8583
         raise ISO8583ParseException.new($!.message+" (#{name})")
       end
 
-      [ real_value, rest ]
+      [ real_value, rest, raw_value ]
     end
     
 
