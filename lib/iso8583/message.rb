@@ -176,7 +176,7 @@ module ISO8583
     # Retrieve the byte representation of the bitmap.
     def to_b
       raise ISO8583Exception.new "no MTI set!" unless mti
-      mti_enc = self.class._mti_format.encode(mti)
+      mti_enc = self.class._mti_format.encode(mti, self)
       mti_enc << _body.join
     end
 
@@ -192,7 +192,11 @@ module ISO8583
 
       @values.keys.sort.each{|bmp_num|
         _bmp = @values[bmp_num]
-        str += ("%03d %#{_max_name}s : %s\n" % [bmp_num, _bmp.name, _bmp.value])
+        value_to_show = _bmp.value
+        if( value_to_show.is_a?( Hash ) )
+          value_to_show = value_to_show.map{|k,v| "#{k}='#{v}'"}.join(' & ')
+        end
+        str += ("%03d %#{_max_name}s : %s\n" % [bmp_num, _bmp.name, value_to_show ])
       }
       str
     end
@@ -212,7 +216,7 @@ module ISO8583
       message = ""
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
-        enc_value = @values[bmp_num].encode
+        enc_value = @values[bmp_num].encode( self )
         message << enc_value
       end
       [ use_hex_bitmap ? bitmap.to_hex : bitmap.to_bytes, message ]
@@ -352,13 +356,13 @@ module ISO8583
       # Parse the bytes `str` returning a message of the defined type.
       def parse(str, use_hex_bitmap = false)
         message = self.new(nil, use_hex_bitmap)
-        message.mti, rest = _mti_format.parse(str)
+        message.mti, rest = _mti_format.parse(str, message)
         bmp, rest = Bitmap.parse(rest, use_hex_bitmap)
         bmp.each { |bit|
           next if bit == 1
           bmp_def      = _definitions[bit]
           if bmp_def && bmp_def.respond_to?('field')
-              value, rest, raw = bmp_def.field.parse_ex(rest)
+              value, rest, raw = bmp_def.field.parse_ex(rest, message)
               message.parsed_raw_values[bit] = raw
           else
             raise ISO8583Exception.new( "bit mask defined the use of element \##{bit}, but in the ISO8583::Message class, used it is not defined for that bit number" )
@@ -428,8 +432,12 @@ module ISO8583
       @field = field
     end
 
-    def encode
-      field.encode(value)
+    def encode( message )
+#      if( field.extended_arguments )
+        field.encode(value, message)
+#      else
+#        field.encode(value)
+#      end
     end
   end
 
