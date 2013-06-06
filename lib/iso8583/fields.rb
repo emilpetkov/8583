@@ -180,4 +180,9 @@ module ISO8583
   Field60.length = LLL
   Field60.codec  = F60_Codec
   Field60.extended_arguments = true
+  
+  Field62        = Field.new
+  Field62.length = LLL
+  Field62.codec  = F62_Codec
+  Field62.extended_arguments = true
 end

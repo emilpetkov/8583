@@ -362,6 +362,9 @@ module ISO8583
           next if bit == 1
           bmp_def      = _definitions[bit]
           if bmp_def && bmp_def.respond_to?('field')
+              if( bmp_def.field.bmp >= 999 )
+                next
+              end
               value, rest, raw = bmp_def.field.parse_ex(rest, message)
               message.parsed_raw_values[bit] = raw
           else
