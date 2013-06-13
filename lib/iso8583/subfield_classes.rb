@@ -7,14 +7,16 @@ module ISO8583
     attr_accessor :mandatory
     attr_accessor :start_position
     attr_accessor :subfield_length
+    attr_accessor :value2text
     
 
-    def set_subfield( map_string_id2subfield, _start_position, _subfield_length, _string_id, _additional_info, _mandatory=true )
+    def set_subfield( map_string_id2subfield, _start_position, _subfield_length, _string_id, _additional_info, _mandatory=true, _value2text = nil )
       @start_position = _start_position
       @subfield_length = _subfield_length
       @string_id = _string_id
       @additional_info = _additional_info
       @mandatory = _mandatory
+      @value2text = _value2text
 
       map_string_id2subfield[ _string_id ] = self
     end
@@ -28,6 +30,8 @@ module ISO8583
 
     def deserialize( result_map, raw_array )
       ISO8583::array_to_hashmap_fixed_len( result_map, @string_id, raw_array, 0, @subfield_length, @additional_info )
+      
+      ISO8583::add_value2text(result_map, @value2text, @string_id )
       @subfield_length
     end
   end
@@ -38,13 +42,15 @@ module ISO8583
     attr_accessor :additional_info
     attr_accessor :mandatory
     attr_accessor :fixed_size
+    attr_accessor :value2text
 
-    def set_subfield( map_numeric_id2subfield, map_string_id2subfield, _fixed_size, _numeric_id, _string_id, _additional_info, _mandatory )
+    def set_subfield( map_numeric_id2subfield, map_string_id2subfield, _fixed_size, _numeric_id, _string_id, _additional_info, _mandatory, _value2text = nil )
       @fixed_size = _fixed_size
       @numeric_id = _numeric_id
       @string_id = _string_id
       @additional_info = _additional_info
       @mandatory = _mandatory
+      @value2text = _value2text
 
       map_numeric_id2subfield[ _numeric_id ] = self
       map_string_id2subfield[ _string_id ] = self
@@ -56,6 +62,7 @@ module ISO8583
 
     def deserialize( result_map, raw_array )
       ISO8583::array_to_hashmap_fixed_len( result_map, @string_id, raw_array, 0, @fixed_size, @additional_info )
+      ISO8583::add_value2text(result_map, @value2text, @string_id )
       @fixed_size
     end
   end
@@ -65,20 +72,24 @@ module ISO8583
     attr_accessor :string_id
     attr_accessor :additional_info
     attr_accessor :mandatory
+    attr_accessor :value2text
 
-    def set_subfield( map_numeric_id2subfield, map_string_id2subfield, _numeric_id, _string_id, _additional_info, _mandatory )
+    def set_subfield( map_numeric_id2subfield, map_string_id2subfield, _numeric_id, _string_id, _additional_info, _mandatory, _value2text = nil )
       @numeric_id = _numeric_id
       @string_id = _string_id
       @additional_info = _additional_info
       @mandatory = _mandatory
+      @value2text = _value2text
 
       map_numeric_id2subfield[ _numeric_id ] = self
       map_string_id2subfield[ _string_id ] = self
     end
 
     def serialize( subfield_value )
-      lll = "%03d" % subfield_value
-      ISO8583::xx_value_to_array( lll + subfield_value,  subfield_value.length+3, @numeric_id, @string_id, @additional_info, @mandatory )
+      field_id_dd = "%02d" % @numeric_id
+      lll = "%03d" % (2 + subfield_value.length) # 2 is the length of field_id_dd
+      
+      lll + field_id_dd + subfield_value
     end
 
     def deserialize( result_map, raw_array )
@@ -87,6 +98,7 @@ module ISO8583
       lll_rest = raw_array[3 .. raw_array.length]
 
       ISO8583::array_to_hashmap_fixed_len( result_map, @string_id, lll_rest, 0, l+2, @additional_info )
+      ISO8583::add_value2text(result_map, @value2text, @string_id )
       l + 2 + 3
     end
   end
@@ -111,6 +123,7 @@ module ISO8583
       end
 
       ISO8583::array_to_hashmap_fixed_len( result_map, @string_id, lll_rest, 2, @fixed_size, @additional_info )
+      ISO8583::add_value2text(result_map, @value2text, @string_id )
       @fixed_size + 3 + 2
     end
   end

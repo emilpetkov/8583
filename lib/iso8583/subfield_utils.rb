@@ -3,6 +3,16 @@
 module ISO8583
 
 
+  def self.add_value2text( deserialization_map, value2text_map, string_id  )
+    return if not value2text_map
+    value = deserialization_map[string_id]
+    return if not value
+    value_info_text = value2text_map[value]
+    return if not value_info_text
+    text_string_id = "#{string_id}_value2text"
+    deserialization_map[ text_string_id ] = value_info_text
+  end
+  
   ##############################################################################
   def self.serialize_fixed_subfields( field_number, string_id2subfield, params_hashtable, message )
     identified_subfields = 0
@@ -38,7 +48,7 @@ module ISO8583
       end
       encoded_subfield = subfield_def.serialize( subfield_value )
       
-      identified_subfields += 1
+      identified_subfields += params_hashtable[subfield_string_id.to_s+"_value2text"] ? 2 : 1
       field_raw_data += encoded_subfield
       index += subfield_def.subfield_length
      end

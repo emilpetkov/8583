@@ -1,23 +1,24 @@
 # Copyright 2013 by eMerchantPay. Author: Georgi Mitev (g.mitev@emerchantpay.com)
 
+
 module ISO8583
   
     F44_visa_string_id2subfield = Hash.new
   
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  0, 1, :visa_reason_code,            "BM 44, subfield :visa_reason_code" )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  1, 1, :visa_avr_code,               "BM 44, subfield :visa_avr_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  2, 1, :visa_reserved3,              "BM 44, subfield :visa_reserved3", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  3, 1, :visa_card_product_type,      "BM 44, subfield :visa_card_product_type", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  4, 1, :visa_cvv_result_code,        "BM 44, subfield :visa_cvv_result_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  5, 2, :visa_pacm_diversion_level,   "BM 44, subfield :visa_pacm_diversion_level", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  7, 1, :visa_pacm_reason_code,       "BM 44, subfield :visa_pacm_reason_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  8, 1, :visa_reserved8,              "BM 44, subfield :visa_reserved8", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  9, 1, :visa_card_authentication_result_code, "BM 44, subfield :visa_card_authentication_result_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 10, 1, :visa_cvv2_result_code,       "BM 44, subfield :visa_cvv2_result_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 11, 2, :visa_original_response_code, "BM 44, subfield :visa_original_response_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 13, 1, :visa_check_settlment_code,   "BM 44, subfield :visa_check_settlment_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 14, 1, :visa_cavv_result_code,       "BM 44, subfield :visa_cavv_result_code", false )
-    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 15, 4, :visa_response_reason_code,   "BM 44, subfield :visa_response_reason_code", false )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  0, 1, :visa_reason_code,            "BM 44, subfield :visa_reason_code", true, BM44::VISA_REASON_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  1, 1, :visa_avr_code,               "BM 44, subfield :visa_avr_code", false, BM44::VISA_AVR_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  2, 1, :visa_reserved3,              "BM 44, subfield :visa_reserved3", false, BM44::VISA_RESERVED3_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  3, 1, :visa_card_product_type,      "BM 44, subfield :visa_card_product_type", false, BM44::VISA_CARD_PRODUCT_TYPE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  4, 1, :visa_cvv_result_code,        "BM 44, subfield :visa_cvv_result_code", false, BM44::VISA_CVV_RESULT_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  5, 2, :visa_pacm_diversion_level,   "BM 44, subfield :visa_pacm_diversion_level", false, BM44::VISA_PACM_DIVERSION_LEVEL_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  7, 1, :visa_pacm_reason_code,       "BM 44, subfield :visa_pacm_reason_code", false, BM44::VISA_PACM_REASON_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  8, 1, :visa_reserved8,              "BM 44, subfield :visa_reserved8", false, BM44::VISA_RESERVED8_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield,  9, 1, :visa_card_authentication_result_code, "BM 44, subfield :visa_card_authentication_result_code", false, BM44::VISA_CARD_AUTHENTICATION_RESULT_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 10, 1, :visa_cvv2_result_code,       "BM 44, subfield :visa_cvv2_result_code", false, BM44::VISA_CVV2_RESULT_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 11, 2, :visa_original_response_code, "BM 44, subfield :visa_original_response_code", false, BM44::VISA_ORIGINAL_RESPONSE_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 13, 1, :visa_check_settlment_code,   "BM 44, subfield :visa_check_settlment_code", false, BM44::VISA_CHECK_SETTLMENT_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 14, 1, :visa_cavv_result_code,       "BM 44, subfield :visa_cavv_result_code", false, BM44::VISA_CAVV_RESULT_CODE_TRANSLATION )
+    FixedPositionSubfield.new.set_subfield( F44_visa_string_id2subfield, 15, 4, :visa_response_reason_code,   "BM 44, subfield :visa_response_reason_code", false, BM44::VISA_RESPONSE_REASON_CODE_TRANSLATION )
   
     F44_mastercard_string_id2subfield = Hash.new
   
