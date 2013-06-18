@@ -9,7 +9,7 @@ module ISO8583
   
   LLLXXFixedSizeSubfield.new.set_subfield( F60_numeric_id2subfield, F60_string_id2subfield,  1, 30, :cvv2_presence_indicator, "BM60: CVV2 Presence Indicator (Visa CNP Only)", false )
   LLLXXFixedSizeSubfield.new.set_subfield( F60_numeric_id2subfield, F60_string_id2subfield, 49, 31, :address_verification_data_request, "BM60: Address Verification Data, Request", false )
-  LLLXXFixedSizeSubfield.new.set_subfield( F60_numeric_id2subfield, F60_string_id2subfield,  2, 32, :address_verification_data_response, "BM60: Address Verification Data, Response", false )
+  LLLXXFixedSizeSubfield.new.set_subfield( F60_numeric_id2subfield, F60_string_id2subfield,  2, 32, :address_verification_data_response, "BM60: Address Verification Data, Response", false, BM60::ADDRESS_VERIFICATION_DATA_RESPONSE_TRANSLATION )
   LLLXXSubfield.new.set_subfield(          F60_numeric_id2subfield, F60_string_id2subfield,     35, :merchant_post_code, "BM60: Merchant Post Code", false )
   LLLXXFixedSizeSubfield.new.set_subfield( F60_numeric_id2subfield, F60_string_id2subfield, 29, 37, :dynamic_currency_conversion_data, "BM60: Dynamic Currency Conversion (DCC) Data", false )
   LLLXXFixedSizeSubfield.new.set_subfield( F60_numeric_id2subfield, F60_string_id2subfield,  2, 40, :electronic_commerce_indicator, "BM60: Electronic Commerce Indicator (ECI)", false )

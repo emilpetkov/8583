@@ -8,6 +8,7 @@ module ISO8583
   require "iso8583/subfield_classes"
   require "iso8583/subfield_bm44_translations"
   require "iso8583/subfield_bm44"
+  require "iso8583/subfield_bm60_translations"
   require "iso8583/subfield_bm60"
   require "iso8583/subfield_bm62"
   require "iso8583/fields"
