@@ -1,5 +1,6 @@
 module ISO8583
   module BM44 
+    
     NO_INFO = nil
     
     MASTERCARD_RESULT_CODE_TRANSLATION = {

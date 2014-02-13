@@ -1,5 +1,6 @@
 module ISO8583
   module BM60
+    
     NO_INFO = nil
     
     ADDRESS_VERIFICATION_DATA_RESPONSE_TRANSLATION1 = {
@@ -42,7 +43,5 @@ module ISO8583
         ADDRESS_VERIFICATION_DATA_RESPONSE_TRANSLATION[ (byte1 + byte2) ] = (translation1+"; "+translation2)
       end
     end
-
-
   end
 end

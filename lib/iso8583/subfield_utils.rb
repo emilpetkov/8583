@@ -1,20 +1,16 @@
-# Copyright 2013 by eMerchantPay. Author: Georgi Mitev (g.mitev@emerchantpay.com)
-
 module ISO8583
 
-
-  def self.add_value2text( deserialization_map, value2text_map, string_id  )
-    return if not value2text_map
+  def self.add_value2text(deserialization_map, value2text_map, string_id)
+    return unless value2text_map
     value = deserialization_map[string_id]
-    return if not value
+    return unless value
     value_info_text = value2text_map[value]
-    return if not value_info_text
+    return unless value_info_text
     text_string_id = "#{string_id}_value2text"
     deserialization_map[ text_string_id ] = value_info_text
   end
-  
-  ##############################################################################
-  def self.serialize_fixed_subfields( field_number, string_id2subfield, params_hashtable, message )
+
+  def self.serialize_fixed_subfields(field_number, string_id2subfield, params_hashtable, message)
     identified_subfields = 0
     field_raw_data = ""
     
@@ -60,8 +56,7 @@ module ISO8583
     field_raw_data
   end
     
-  ##############################################################################
-  def self.deserialize_fixed_subfields( field_number, string_id2subfield, raw_src, message )
+  def self.deserialize_fixed_subfields(field_number, string_id2subfield, raw_src, message)
     result_hashmap = Hash.new
     index = 0
     string_id2subfield.keys.sort_by { |key| string_id2subfield[key].start_position }.each do |subfield_string_id|
@@ -76,33 +71,12 @@ module ISO8583
       subfield_length = subfield_def.deserialize( result_hashmap, raw_subfield_value )
       index += subfield_length
     end
-    
-=begin
-    while index != raw_src.length
-      rest = raw_src[ index .. raw_src.length - 1 ]
-      subfield_id = raw_src[index+3 .. index+4].to_i
-      subfield_def = string_id2subfield[ subfield_id ]
-      
-      if( subfield_def == nil )
-        raise ArgumentError.new "BM #{field_number} Unknown subfield with id '#{subfield_id}', index='#{index}', rest='#{rest}'"
-      end
-      
-#      puts "setting id #{subfield_def.string_id}"
-
-      subfield_length = subfield_def.deserialize( result_hashmap, rest  )
-      
-      index += subfield_length # 2 is for the prefix
-    end # while
-=end
-
     result_hashmap
   end
 
-  ##############################################################################
-  def self.serialize_lllxx_subfields( field_number, string_id2subfield, params_hashtable, message )
+  def self.serialize_lllxx_subfields(field_number, string_id2subfield, params_hashtable, message)
     identified_subfields = 0
     field_raw_data = ""
-    
     
     params_hashtable.keys.sort_by { |key| key.to_s }.each do 
       |subfield_string_id|
@@ -124,8 +98,7 @@ module ISO8583
     field_raw_data
   end
     
-  ##############################################################################
-  def self.deserialize_lllxx_subfields( field_number, numeric_id2subfield, raw_src, message )
+  def self.deserialize_lllxx_subfields(field_number, numeric_id2subfield, raw_src, message)
     result_hashmap = Hash.new
     index = 0
     while index != raw_src.length
@@ -140,70 +113,63 @@ module ISO8583
         raise ArgumentError.new "BM #{field_number} Unknown subfield with id '#{subfield_id}', index='#{index}', rest='#{rest}'"
       end
       
-#      puts "setting id #{subfield_def.string_id}"
-
       subfield_length = subfield_def.deserialize( result_hashmap, rest  )
-      
       index += subfield_length # 2 is for the prefix
     end # while
 
     result_hashmap
   end
 
-  ##############################################################################
-  def self.array_to_hashmap_fixed_len( hashmap, hashmap_id, raw_array, start_pos, data_len, field_info )
-    if( raw_array.length < (start_pos + data_len) )
-      raise ArgumentError.new field_info + ": No space in raw array to src value, arr_len=#{raw_array.length}, data_end_pos=#{start_pos + data_len}"
+  def self.array_to_hashmap_fixed_len(hashmap, hashmap_id, raw_array, start_pos, data_len, field_info)
+    if raw_array.length < (start_pos + data_len)
+      raise ArgumentError.new("#{field_info}: No space in raw array to src value, arr_len=#{raw_array.length}, data_end_pos=#{start_pos + data_len}")
     end
-#puts "setting id #{hashmap_id} with value '#{raw_array[ start_pos .. (start_pos+data_len-1) ]}'"
     hashmap[ hashmap_id ] = raw_array[ start_pos .. (start_pos+data_len-1) ]    
-    
     start_pos + data_len
   end
   
-  ##############################################################################
-  def self.value_to_array( src, raw_array, start_pos, data_len, field_info, mandatory )
-    if( raw_array.length < (start_pos + data_len) )
-      raise ArgumentError.new field_info + ": No space in raw array to src value, arr_len=#{raw_array.length}, data_end_pos=#{start_pos + data_len}"
+  def self.value_to_array(src, raw_array, start_pos, data_len, field_info, mandatory)
+    if raw_array.length < (start_pos + data_len)
+      raise ArgumentError.new("#{field_info}: No space in raw array to src value, arr_len=#{raw_array.length}, data_end_pos=#{start_pos + data_len}")
     end
     
-    if( (not src) || src.length < 1 )
-      if( mandatory )
-        raise ArgumentError.new field_info + ": mandatory field is not filled"
+    unless src or src.length < 1
+      if mandatory
+        raise ArgumentError.new("#{field_info}: mandatory field is not filled")
       else
         # just skipping
         return
       end
     end
     
-    if( src.length != data_len )
-        raise ArgumentError.new field_info + ": src_field_length=#{src.length}; dst_field_length=#{data_len}; src='#{src}'"
+    if src.length != data_len
+      raise ArgumentError.new("#{field_info}: src_field_length=#{src.length}; dst_field_length=#{data_len}; src='#{src}'")
     end
     
-    raw_array[ start_pos .. (start_pos+data_len-1) ] = src
+    raw_array[start_pos..(start_pos + data_len - 1)] = src
   end
   
-  def self.xx_value_to_array( raw_array, data_len, subfield_num_id1, subfield_str_id1, field_info1, mandatory )
-    if( (not raw_array) && (not mandatory) )
+  def self.xx_value_to_array(raw_array, data_len, subfield_num_id1, subfield_str_id1, field_info1, mandatory)
+    if (not raw_array) && (not mandatory)
       return ""
     end
     
     if( subfield_num_id1 < 0 || subfield_num_id1 > 99 )
-      raise ArgumentError.new "#{field_info1} (subfield_id=#{subfield_num_id1}/#{subfield_str_id1}): subfield_id is not in range 00-99"
+      raise ArgumentError.new("#{field_info1} (subfield_id=#{subfield_num_id1}/#{subfield_str_id1}): subfield_id is not in range 00-99")
     end
     
     subfield_id2 = (subfield_num_id1 < 10 ? "0" : "") + subfield_num_id1.to_s
     
-    field_info2 = (field_info2 ? field_info2 + " " : "") + "(subfield_id=#{subfield_num_id1}/#{subfield_str_id1})";
+    field_info2 = (field_info2 ? field_info2 + " " : "") + "(subfield_id=#{subfield_num_id1}/#{subfield_str_id1})"
     
     if data_len != raw_array.length
-      raise ArgumentError.new "#{field_info1} (subfield_id=#{subfield_num_id1}/#{subfield_str_id1}): provided data length(#{raw_array.length}) differs from required length(#{data_len}). Value is '#{raw_array}'"
+      raise ArgumentError.new("#{field_info1} (subfield_id=#{subfield_num_id1}/#{subfield_str_id1}): provided data length(#{raw_array.length}) differs from required length(#{data_len}). Value is '#{raw_array}'")
     end
     
     subfield_id2 + raw_array
-#    value_to_array( subfield_id2 + src, raw_array, start_pos, data_len + 2, field_info2, mandatory )
   end
-  ##############################################################################
+  
+  # TODO - this is crap, needs to use the bin list
   def self.credit_card_brand(number)
     digits = number.to_s[0..3].to_i
     case digits
@@ -229,5 +195,4 @@ module ISO8583
         'unknown'
     end
   end
-  
-end # module
+end
