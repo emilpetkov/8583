@@ -10,7 +10,7 @@ module ISO8583
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield, 29, 37, :dynamic_currency_conversion_data, "BM60: Dynamic Currency Conversion (DCC) Data", false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  2, 40, :electronic_commerce_indicator, "BM60: Electronic Commerce Indicator (ECI)", false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  1, 51, :recurring_payment_indicator, "BM60: Recurring Payment Indicator", false)
-  LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  2, 52, :recurring_payment_response, "BM60: Recurring Payment Response", false)
+  LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  2, 52, :recurring_payment_response, "BM60: Recurring Payment Response", false, BM60::RECURRING_PAYMENT_RESPONSE_TRANSLATION)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  3, 53, :terminal_capabilities, "BM60: Terminal Capabilities", false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield, 99, 54, :batch_information, "BM60: Batch Information", false) # TODO, when available more info
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield, 30, 55, :additional_authorisation_data, "BM60: Additional Authorisation Data", false)

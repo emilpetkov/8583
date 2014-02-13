@@ -43,5 +43,12 @@ module ISO8583
         ADDRESS_VERIFICATION_DATA_RESPONSE_TRANSLATION[ (byte1 + byte2) ] = (translation1+"; "+translation2)
       end
     end
+    
+    RECURRING_PAYMENT_RESPONSE_TRANSLATION = {
+			'01' => 'New Account Information available',
+			'02' => 'Try again later',
+			'03' => 'Do not try again',
+			'21' => 'Recurring Payment Cancellation Service'
+    }
   end
 end
