@@ -31,18 +31,18 @@ module ISO8583
     card_brand = credit_card_brand(message[2]).downcase # field 2 is PAN
 
     case card_brand
-    when "mastercard", "intl maestro"
+    when 'master', 'Intl Maestro'
       # correct the variable length of the last element
       my_F44_mastercard_string_id2subfield = F44_mastercard_string_id2subfield.dup
       my_F44_mastercard_string_id2subfield[:mastercard_banknet_additional].subfield_length = params_hashtable[:mastercard_banknet_additional].length
 
       serialize_fixed_subfields(62, my_F44_mastercard_string_id2subfield, params_hashtable, message)
-    when "visa"
+    when 'visa'
       serialize_fixed_subfields(62, F44_visa_string_id2subfield, params_hashtable, message)
     else
       error_message = "don't know how to decode BM 44 for card brand #{card_brand}, so leaving the other fields empty"
       puts error_message
-      return "card_brand unknown"
+      return 'card_brand unknown'
     end
   end
 
@@ -52,7 +52,7 @@ module ISO8583
     card_brand = credit_card_brand(message[2]).downcase # field 2 is PAN
 
     case card_brand
-    when "mastercard", "intl maestro"
+    when 'master', 'Intl Maestro'
       # correct the variable length of the last element
       my_F44_mastercard_string_id2subfield = F44_mastercard_string_id2subfield.dup
 
@@ -61,7 +61,7 @@ module ISO8583
 
 
       deserialize_fixed_subfields(44, my_F44_mastercard_string_id2subfield, raw, message)
-    when "visa"
+    when 'visa'
       my_F44_visa_string_id2subfield = F44_visa_string_id2subfield.dup
       my_F44_visa_string_id2subfield = my_F44_visa_string_id2subfield.reject { |k,v| v.start_position >= raw.length }
 

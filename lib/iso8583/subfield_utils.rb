@@ -186,7 +186,7 @@ module ISO8583
       when 5018, 5020, 5038, 5457, 5888, 5893, 6304, 6759, 6761, 6762, 6763, 0604, 6333, 6220
         'Intl Maestro'
       when 5100..5599, 6000..6799
-        'mastercard'
+        'master'
       when 5610
         'australian bankcard'
       when 6011
