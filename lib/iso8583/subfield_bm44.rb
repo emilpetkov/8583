@@ -21,7 +21,7 @@ module ISO8583
 
   FixedPositionSubfield.new.set_subfield(F44_mastercard_string_id2subfield,  0,  1, :mastercard_result_code,          "BM 44, subfield :mastercard_result_code")
   FixedPositionSubfield.new.set_subfield(F44_mastercard_string_id2subfield,  1, 12, :mastercard_banknet_reference_id, "BM 44, subfield :mastercard_banknet_reference_id")
-  FixedPositionSubfield.new.set_subfield(F44_mastercard_string_id2subfield, 13, 25, :mastercard_banknet_additional,   "BM 44, subfield :mastercard_banknet_reference_id")
+  FixedPositionSubfield.new.set_subfield(F44_mastercard_string_id2subfield, 13, 25, :mastercard_banknet_additional,   "BM 44, subfield :mastercard_banknet_additional")
   
   F44_Codec = Codec.new
   F44_Codec.encoder = lambda { |params_hashtable, message| serialize_bm44_subfields_new(params_hashtable, message) }
@@ -31,7 +31,7 @@ module ISO8583
     card_brand = credit_card_brand(message[2]).downcase # field 2 is PAN
 
     case card_brand
-    when 'master', 'Intl Maestro'
+    when 'master', 'intl maestro'
       # correct the variable length of the last element
       my_F44_mastercard_string_id2subfield = F44_mastercard_string_id2subfield.dup
       my_F44_mastercard_string_id2subfield[:mastercard_banknet_additional].subfield_length = params_hashtable[:mastercard_banknet_additional].length
@@ -52,7 +52,7 @@ module ISO8583
     card_brand = credit_card_brand(message[2]).downcase # field 2 is PAN
 
     case card_brand
-    when 'master', 'Intl Maestro'
+    when 'master', 'intl maestro'
       # correct the variable length of the last element
       my_F44_mastercard_string_id2subfield = F44_mastercard_string_id2subfield.dup
 
