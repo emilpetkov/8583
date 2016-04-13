@@ -1,3 +1,7 @@
+0.1.8
+==========
+  Added 2 series bin for Mastercard
+  BM62 is not a proper LLLVAR...999 variable field
 0.1.7
 ==========
   Minor fixes in card brands and BM 44
