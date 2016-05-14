@@ -9,6 +9,7 @@ module ISO8583
     attr_accessor :codec
     attr_accessor :padding
     attr_accessor :max
+    attr_accessor :extended_arguments
 
     attr_writer   :name
     attr_accessor :bmp
@@ -17,12 +18,17 @@ module ISO8583
       "BMP #{bmp}: #{@name}"
     end
 
-    def parse(raw)
+    def parse( raw, message )
+      real_value, rest, raw_value = parse_ex( raw, message )
+      [ real_value, rest ]
+    end
+
+    def parse_ex( raw, message )
       len, raw = case length
                  when Fixnum
                    [length, raw]
                  when Field
-                   length.parse(raw)
+                   length.parse(raw, message)
                  else
                    raise ISO8583Exception.new("Cannot determine the length of '#{name}' field")
                  end
@@ -31,18 +37,18 @@ module ISO8583
       
       # make sure we have enough data ...
       if raw_value.length != len
-        mes = "Field has incorrect length! field: #{raw_value} len/expected: #{raw_value.length}/#{len}"
+        mes = "Field has incorrect length! field: #{raw_value} len/expected: #{raw_value.length}/#{len}; Field name is '#{@name}'"
         raise ISO8583ParseException.new(mes)
       end
 
       rest = raw[len, raw.length]
       begin
-        real_value = codec.decode(raw_value)
-      rescue
-        raise ISO8583ParseException.new($!.message+" (#{name})")
+        real_value = codec.decode( raw_value, @extended_arguments ? message : nil )
+#      rescue
+#        raise ISO8583ParseException.new($!.message+" (#{name})")
       end
 
-      [ real_value, rest ]
+      [ real_value, rest, raw_value ]
     end
     
 
@@ -51,8 +57,12 @@ module ISO8583
     # The order may be important! This impl calls codec.encode and then pads, in case you need the other 
     # special treatment, you may need to override this method alltogether.
     # In other cases, the padding has to be implemented by the codec, such as BCD with an odd number of nibbles.
-    def encode(value)
-      encoded_value = codec.encode(value) 
+    def encode(value, message)
+      if( @extended_arguments )
+        encoded_value = codec.encode(value, message) 
+      else
+        encoded_value = codec.encode(value) 
+      end
 
       if padding
         if padding.arity == 1
@@ -60,6 +70,10 @@ module ISO8583
         elsif padding.arity == 2
           encoded_value = padding.call(encoded_value, length)
         end
+      end
+      
+      if( encoded_value == nil )
+        puts "\n\n\nencoded_value == nil for value = #{value}\n\n\n"
       end
 
       len_str = case length
@@ -69,7 +83,7 @@ module ISO8583
                   "" 
                 when Field
                   raise ISO8583Exception.new("Max lenth exceeded: #{value}, max: #{max}") if max && encoded_value.length > max
-                  length.encode(encoded_value.length)
+                  length.encode(encoded_value.length, message)
                 else
                   raise ISO8583Exception.new("Invalid length (#{length}) for '#{name}' field")
                 end

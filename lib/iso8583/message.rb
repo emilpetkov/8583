@@ -115,6 +115,8 @@ module ISO8583
     # ISO8583 allows hex or binary bitmap, so it should be configurable
     attr_reader :use_hex_bitmap
     
+    attr_reader :parsed_raw_values
+
     # Instantiate a new instance of this type of Message
     # optionally specifying an mti. 
     def initialize(mti = nil, use_hex_bitmap = false)
@@ -122,6 +124,7 @@ module ISO8583
       # bmp number | bmp name | field en/decoders | values
       # which are set in this message.
       @values = {}
+      @parsed_raw_values = {}
       @use_hex_bitmap = use_hex_bitmap
       self.mti = mti if mti
     end
@@ -173,7 +176,7 @@ module ISO8583
     # Retrieve the byte representation of the bitmap.
     def to_b
       raise ISO8583Exception.new "no MTI set!" unless mti
-      mti_enc = self.class._mti_format.encode(mti)
+      mti_enc = self.class._mti_format.encode(mti, self)
       mti_enc << _body.join
     end
 
@@ -189,9 +192,17 @@ module ISO8583
 
       @values.keys.sort.each{|bmp_num|
         _bmp = @values[bmp_num]
-        str += ("%03d %#{_max_name}s : %s\n" % [bmp_num, _bmp.name, _bmp.value])
+        value_to_show = _bmp.value
+        if( value_to_show.is_a?( Hash ) )
+          value_to_show = value_to_show.map{|k,v| "#{k}='#{v}'"}.join(' & ')
+        end
+        str += ("%03d %#{_max_name}s : %s\n" % [bmp_num, _bmp.name, value_to_show ])
       }
       str
+    end
+
+    def raw_value( key )
+      @parsed_raw_values[ key ]
     end
 
 
@@ -205,7 +216,7 @@ module ISO8583
       message = ""
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
-        enc_value = @values[bmp_num].encode
+        enc_value = @values[bmp_num].encode( self )
         message << enc_value
       end
       [ use_hex_bitmap ? bitmap.to_hex : bitmap.to_bytes, message ]
@@ -345,12 +356,20 @@ module ISO8583
       # Parse the bytes `str` returning a message of the defined type.
       def parse(str, use_hex_bitmap = false)
         message = self.new(nil, use_hex_bitmap)
-        message.mti, rest = _mti_format.parse(str)
+        message.mti, rest = _mti_format.parse(str, message)
         bmp, rest = Bitmap.parse(rest, use_hex_bitmap)
         bmp.each { |bit|
           next if bit == 1
           bmp_def      = _definitions[bit]
-          value, rest  = bmp_def.field.parse(rest)
+          if bmp_def && bmp_def.respond_to?('field')
+              if( bmp_def.field.bmp >= 999 )
+                next
+              end
+              value, rest, raw = bmp_def.field.parse_ex(rest, message)
+              message.parsed_raw_values[bit] = raw
+          else
+            raise ISO8583Exception.new( "bit mask defined the use of element \##{bit}, but in the ISO8583::Message class, used it is not defined for that bit number" )
+          end
           message[bit] = value
         }
         message
@@ -416,8 +435,12 @@ module ISO8583
       @field = field
     end
 
-    def encode
-      field.encode(value)
+    def encode( message )
+#      if( field.extended_arguments )
+        field.encode(value, message)
+#      else
+#        field.encode(value)
+#      end
     end
   end
 
