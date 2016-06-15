@@ -18,7 +18,6 @@ module ISO8583
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield, 40, 62, :cavv, "BM60: CAVV (VISA Cardholder Authentication Verification Value  - CAVV – 3D Secure", false)
   LLLXXSubfield.new.set_subfield(         F60_numeric_id2subfield, F60_string_id2subfield,     63, :ucaf, "BM60: UCAF Data", false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  6, 64, :mastercard_assigned_id, "BM60: MasterCard Assigned ID", false)
-  LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield, 28, 92, :scheme_reference_data, "BM60: Scheme Reference Data", false)
 
   F60_Codec = Codec.new
   F60_Codec.encoder = lambda { |params_hashtable, message| serialize_lllxx_subfields(60, F60_string_id2subfield, params_hashtable, message) }
