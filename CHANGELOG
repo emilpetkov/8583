@@ -1,3 +1,15 @@
+0.1.12
+==========
+  Added support for BM60.65, ewallet data
+0.1.11
+==========
+  Dropped support for BM60.92, scheme reference data
+0.1.10
+==========
+  Updated bins mapping on new latest ExactBins DB 
+0.1.9
+==========
+  Added some Maestro bins to the bins mapping 
 0.1.8
 ==========
   Added 2 series bin for Mastercard

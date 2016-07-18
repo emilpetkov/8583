@@ -1,4 +1,4 @@
 # -*- mode: ruby; encoding: utf-8; tab-width: 2; indent-tabs-mode: nil -*-
 module ISO8583
-  VERSION = '0.1.11'
+  VERSION = '0.1.12'
 end
