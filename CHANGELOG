@@ -1,6 +1,9 @@
+0.1.14
+==========
+  Fixed more issues with the LLLXXSubfield deserialization
 0.1.13
 ==========
-  Fixed bug in the LLLXXSubfield deserialization
+  Fixed a bug in the LLLXXSubfield deserialization
 0.1.12
 ==========
   Added support for BM60.65, ewallet data

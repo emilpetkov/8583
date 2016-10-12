@@ -124,7 +124,7 @@ module ISO8583
     if raw_array.length < (start_pos + data_len)
       raise ArgumentError.new("#{field_info}: No space in raw array to src value, arr_len=#{raw_array.length}, data_end_pos=#{start_pos + data_len}")
     end
-    hashmap[ hashmap_id ] = raw_array[ start_pos .. (start_pos+data_len-1) ]    
+    hashmap[hashmap_id] = raw_array[start_pos..(start_pos + data_len - 1)] 
     start_pos + data_len
   end
   

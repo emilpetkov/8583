@@ -91,13 +91,13 @@ module ISO8583
     end
 
     def deserialize(result_map, raw_array)
-      lll = raw_array[0,3]
+      lll = raw_array[0, 3]
       l = lll.to_i
-      lll_rest = raw_array[3 .. raw_array.length]
+      lll_rest = raw_array[3..raw_array.length]
 
-      ISO8583::array_to_hashmap_fixed_len( result_map, @string_id, lll_rest, 0, l+2, @additional_info )
-      ISO8583::add_value2text(result_map, @value2text, @string_id )
-      l + 2 + 3
+      ISO8583::array_to_hashmap_fixed_len(result_map, @string_id, lll_rest, 2, l - 2, @additional_info)
+      ISO8583::add_value2text(result_map, @value2text, @string_id)
+      l + 3
     end
   end
   
