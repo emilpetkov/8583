@@ -92,7 +92,7 @@ module ISO8583
 
     def deserialize(result_map, raw_array)
       lll = raw_array[0,3]
-      l = lll.to.i
+      l = lll.to_i
       lll_rest = raw_array[3 .. raw_array.length]
 
       ISO8583::array_to_hashmap_fixed_len( result_map, @string_id, lll_rest, 0, l+2, @additional_info )
