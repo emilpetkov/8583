@@ -69,13 +69,28 @@ module ISO8583
     attr_accessor :encoder
     attr_accessor :decoder
 
-    def decode(raw)
-      decoder.call(raw)
+#    def decode(raw)
+#      decoder.call(raw)
+#    end
+
+    def decode(raw, message=nil)
+      if( message )
+        decoder.call(raw, message)
+      else
+        decoder.call(raw)
+      end
     end
 
     # length is either a fixnum or a lenth encoder.
-    def encode(value)
-      encoder.call(value)
+#    def encode(value)
+#      encoder.call(value)
+#    end
+    def encode(value, message=nil)
+      if( message )
+        encoder.call(value, message)
+      else
+        encoder.call(value)
+      end
     end
   end
 
@@ -122,14 +137,14 @@ module ISO8583
 
   AN_Codec = Codec.new
   AN_Codec.encoder = lambda{|str|
-    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-y0-9]") unless str =~ /^[A-Za-z0-9]*$/
+    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-z0-9]") unless str =~ /^[A-Za-z0-9]*$/
     str
   }
   AN_Codec.decoder = PASS_THROUGH_DECODER
 
   ANP_Codec = Codec.new
   ANP_Codec.encoder = lambda{|str|
-    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-y0-9 ]") unless str =~ /^[A-Za-z0-9 ]*$/
+    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-z0-9 ]") unless str =~ /^[A-Za-z0-9 ]*$/
     str
   }
   ANP_Codec.decoder = PASS_THROUGH_DECODER
@@ -200,4 +215,6 @@ module ISO8583
   # codec patch
   HHMMSSCodec       = _date_codec("%H%M%S")
   MMDDCodec         = _date_codec("%m%d")
+
+
 end
