@@ -3,6 +3,7 @@
 # this distribution
 
 require 'date'
+require 'iconv'
 
 module ISO8583
 
@@ -219,11 +220,14 @@ module ISO8583
 
   EBCDIC_Codec = Codec.new
   EBCDIC_Codec.encoder = -> (ascii_str) {
-    #raise ISO8583Exception.new("String (#{ascii_str})not valid!")
+    raise ISO8583Exception.new("String (#{ascii_str})not valid!")
+
+    codec = Iconv.new('EBCDIC-US', 'ASCII')
+    codec.iconv(ascii_str)
   }
   EBCDIC_Codec.decoder = -> (ebcdic_str) {
-    # you may or may not want to raise exceptions at this point ....
-    # strip removes any padding...
+    codec = Iconv.new('ASCII-US', 'EBCDIC-US')
+    codec.iconv(ebcdic_str)
   }
 
 end
