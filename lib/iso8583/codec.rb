@@ -217,4 +217,13 @@ module ISO8583
   MMDDCodec         = _date_codec("%m%d")
 
 
+  EBCDIC_Codec = Codec.new
+  EBCDIC_Codec.encoder = -> (ascii_str) {
+    #raise ISO8583Exception.new("String (#{ascii_str})not valid!")
+  }
+  EBCDIC_Codec.decoder = -> (ebcdic_str) {
+    # you may or may not want to raise exceptions at this point ....
+    # strip removes any padding...
+  }
+
 end

@@ -35,6 +35,8 @@ module ISO8583
   # [+MMDDhhmmss+]   Date, formatted as described in ASCII numerals
   # [+YYMMDDhhmmss+] Date, formatted as named in ASCII numerals
   # [+YYMM+]         Expiration Date, formatted as named in ASCII numerals
+  # [+LLVARN_EBCDIC+] two byte variable length EBCDIC encoded
+  # [+LLLVARN_EBCDIC+] three byte variable length EBCDIC encoded
 
 
   # Special form to de/encode variable length indicators, two bytes ASCII numerals 
@@ -190,4 +192,16 @@ module ISO8583
   Field62.length = LLL
   Field62.codec  = F62_Codec
   Field62.extended_arguments = true
+
+  # Two byte variable length EBCDIC encoded
+  LLVARN_EBCDIC  = Field.new
+  LLVARN_EBCDIC.length = LL
+  LLVARN_EBCDIC.codec  = EBCDIC_Codec
+  LLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
+
+  # Three byte variable length EBCDIC encoded
+  LLLVARN_EBCDIC = Field.new
+  LLLVARN_EBCDIC.length = LL
+  LLLVARN_EBCDIC.codec  = EBCDIC_Codec
+  LLLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
 end
