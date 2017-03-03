@@ -3,7 +3,6 @@
 # this distribution
 
 require 'date'
-require 'iconv'
 
 module ISO8583
 
@@ -220,14 +219,11 @@ module ISO8583
 
   EBCDIC_Codec = Codec.new
   EBCDIC_Codec.encoder = -> (ascii_str) {
-    raise ISO8583Exception.new("String (#{ascii_str})not valid!")
-
-    codec = Iconv.new('EBCDIC-US', 'ASCII')
-    codec.iconv(ascii_str)
+    raise ISO8583Exception.new("#{ascii_str} must be a valid string") unless ascii_str.is_a?(String)
+    ISO8583.ascii2ebcdic(ascii_str)#.encode('UTF-8', invalid: :replace, replace: '')
   }
   EBCDIC_Codec.decoder = -> (ebcdic_str) {
-    codec = Iconv.new('ASCII-US', 'EBCDIC-US')
-    codec.iconv(ebcdic_str)
+    ebcdic2ascii(ebcdic_str)
   }
 
 end

@@ -36,6 +36,7 @@ module ISO8583
     }
     _str
   end
+  module_function :_conv
 
   #
   # Convert a String of ASCII chars to EBCDIC
@@ -43,6 +44,7 @@ module ISO8583
   def ascii2ebcdic(ascii)
     _conv(ascii, US_ASCII2IBM037)
   end
+  module_function :ascii2ebcdic
 
   #
   # Convert an EBCDIC String to ASCII
