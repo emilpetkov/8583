@@ -32,7 +32,7 @@ module ISO8583
   def _conv(str, mapping)
     _str = ""
     str.each_byte{|byte|
-      _str << mapping[byte]
+      _str << [mapping[byte]].pack("C")
     }
     _str
   end
