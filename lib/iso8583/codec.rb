@@ -220,7 +220,7 @@ module ISO8583
   EBCDIC_Codec = Codec.new
   EBCDIC_Codec.encoder = -> (ascii_str) {
     raise ISO8583Exception.new("#{ascii_str} must be a valid string") unless ascii_str.is_a?(String)
-    ISO8583.ascii2ebcdic(ascii_str)#.encode('UTF-8', invalid: :replace, replace: '')
+    ISO8583.ascii2ebcdic(ascii_str).force_encoding('UTF-8')
   }
   EBCDIC_Codec.decoder = -> (ebcdic_str) {
     ebcdic2ascii(ebcdic_str)

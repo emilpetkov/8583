@@ -217,7 +217,8 @@ module ISO8583
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
         enc_value = @values[bmp_num].encode( self )
-        puts "ENCRYPTED VALUE FOR #{bmp_num}::#{enc_value.encoding.to_s}"
+        puts "MESSAGE SO FAR: #{message}"
+        puts "ENCRYPTED VALUE FOR #{bmp_num}::#{enc_value}::#{enc_value.encoding.to_s}"
         message << enc_value
       end
       [ use_hex_bitmap ? bitmap.to_hex : bitmap.to_bytes, message ]

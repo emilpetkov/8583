@@ -194,14 +194,14 @@ module ISO8583
   Field62.extended_arguments = true
 
   # Two byte variable length EBCDIC encoded
-  LLVARN_EBCDIC  = Field.new
-  LLVARN_EBCDIC.length = LL
-  LLVARN_EBCDIC.codec  = EBCDIC_Codec
+  LLVAR_EBCDIC  = Field.new
+  LLVAR_EBCDIC.length = LL
+  LLVAR_EBCDIC.codec  = EBCDIC_Codec
   #LLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
 
   # Three byte variable length EBCDIC encoded
-  LLLVARN_EBCDIC = Field.new
-  LLLVARN_EBCDIC.length = LL
-  LLLVARN_EBCDIC.codec  = EBCDIC_Codec
+  LLLVAR_EBCDIC = Field.new
+  LLLVAR_EBCDIC.length = LL
+  LLLVAR_EBCDIC.codec  = EBCDIC_Codec
   #LLLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
 end
