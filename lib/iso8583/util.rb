@@ -52,6 +52,7 @@ module ISO8583
   def ebcdic2ascii(ebcdic)
     _conv(ebcdic, IBM0372US_ASCII)
   end
+  module_function :ebcdic2ascii
 
   # The charsets supported by iconv aren't guranteed. At the very least MACs don't support ebcdic,
   # so providing rudimentary mappings here.
