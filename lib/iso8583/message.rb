@@ -177,7 +177,10 @@ module ISO8583
     def to_b
       raise ISO8583Exception.new "no MTI set!" unless mti
       mti_enc = self.class._mti_format.encode(mti, self)
-      mti_enc << _body.join
+      # Added the next two lines from the original gem
+      str_body="".force_encoding('ASCII-8BIT')
+      _body.map {|b| str_body+=b.force_encoding('ASCII-8BIT')}
+      mti_enc << str_body
     end
 
     # Returns a nicely formatted representation of this
@@ -213,11 +216,11 @@ module ISO8583
     # [bitmap_bytes, message_bytes]
     def _body
       bitmap  = Bitmap.new
-      message = ""
+      message = "".force_encoding('ASCII-8BIT')
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
         enc_value = @values[bmp_num].encode( self )
-        puts "MESSAGE SO FAR: #{message}"
+        puts "MESSAGE SO FAR: #{message}, encoding: #{message.encoding.to_s}"
         puts "ENCRYPTED VALUE FOR #{bmp_num}::#{enc_value}::#{enc_value.encoding.to_s}"
         message << enc_value
       end
