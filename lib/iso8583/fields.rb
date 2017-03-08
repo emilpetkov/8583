@@ -35,10 +35,11 @@ module ISO8583
   # [+MMDDhhmmss+]   Date, formatted as described in ASCII numerals
   # [+YYMMDDhhmmss+] Date, formatted as named in ASCII numerals
   # [+YYMM+]         Expiration Date, formatted as named in ASCII numerals
-  # [+LLVARN_EBCDIC+] two byte variable length EBCDIC encoded
-  # [+LLLVARN_EBCDIC+] three byte variable length EBCDIC encoded
+  # [+LL_EBCDIC+] two byte variable length EBCDIC encoded
+  # [+LLL_EBCDIC+] three byte variable length EBCDIC encoded
 
 
+  ## Length encodings
   # Special form to de/encode variable length indicators, two bytes ASCII numerals 
   LL         = Field.new
   LL.name    = "LL"
@@ -56,9 +57,22 @@ module ISO8583
     sprintf("%03d", value)
   }
 
+  # Special form to de/encode variable length indicators, two byte variable length EBCDIC encoded
+  LL_EBCDIC  = Field.new
+  LL_EBCDIC.length = 2
+  LL_EBCDIC.codec = EBCDIC_Codec
+  #LLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
+
+  # Special form to de/encode variable length indicators, three byte variable length EBCDIC encoded
+  LLL_EBCDIC = Field.new
+  LLL_EBCDIC.length = 3
+  LLL_EBCDIC.codec = EBCDIC_Codec
+  #LLLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
+
   LL_BCD        = BCDField.new
   LL_BCD.length = 2
   LL_BCD.codec  = Packed_Number
+  ##Length encoding
 
   # Two byte variable length ASCII numeral, payload ASCII numerals
   LLVAR_N        = Field.new
@@ -193,15 +207,11 @@ module ISO8583
   Field62.codec  = F62_Codec
   Field62.extended_arguments = true
 
-  # Two byte variable length EBCDIC encoded
-  LL_EBCDIC  = Field.new
-  LL_EBCDIC.length = 2
-  LL_EBCDIC.codec  = EBCDIC_Codec
-  #LLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
+  LL_EBCDIC_BCD = BCDField.new
+  LL_EBCDIC_BCD.length = LL_EBCDIC
+  LL_EBCDIC_BCD.codec = Packed_Number
 
-  # Three byte variable length EBCDIC encoded
-  LLL_EBCDIC = Field.new
-  LLL_EBCDIC.length = 3
-  LLL_EBCDIC.codec  = EBCDIC_Codec
-  #LLLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
+  LLL_EBCDIC_BCD = BCDField.new
+  LLL_EBCDIC_BCD.length = LLL_EBCDIC
+  LLL_EBCDIC_BCD.codec = Packed_Number
 end

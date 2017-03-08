@@ -59,9 +59,9 @@ module ISO8583
     # In other cases, the padding has to be implemented by the codec, such as BCD with an odd number of nibbles.
     def encode(value, message)
       if( @extended_arguments )
-        encoded_value = codec.encode(value, message) 
+        encoded_value = codec.encode(value, message)
       else
-        encoded_value = codec.encode(value) 
+        encoded_value = codec.encode(value)
       end
 
       if padding
@@ -80,7 +80,7 @@ module ISO8583
                 when Fixnum
                   raise ISO8583Exception.new("Too long: #{value} (#{name})! length=#{length}")  if encoded_value.length > length
                   raise ISO8583Exception.new("Too short: #{value} (#{name})! length=#{length}") if encoded_value.length < length
-                  "" 
+                  "".force_encoding('ASCII-8BIT')
                 when Field
                   raise ISO8583Exception.new("Max lenth exceeded: #{value}, max: #{max}") if max && encoded_value.length > max
                   length.encode(encoded_value.length, message)

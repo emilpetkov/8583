@@ -179,7 +179,7 @@ module ISO8583
       mti_enc = self.class._mti_format.encode(mti, self)
       # Added the next two lines from the original gem
       str_body="".force_encoding('ASCII-8BIT')
-      _body.map {|b| str_body+=b.force_encoding('ASCII-8BIT')}
+      _body.map { |b| str_body += b.force_encoding('ASCII-8BIT') }
       mti_enc << str_body
     end
 
@@ -220,8 +220,6 @@ module ISO8583
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
         enc_value = @values[bmp_num].encode( self )
-        puts "MESSAGE SO FAR: #{message}, encoding: #{message.encoding.to_s}"
-        puts "ENCRYPTED VALUE FOR #{bmp_num}::#{enc_value}::#{enc_value.encoding.to_s}"
         message << enc_value
       end
       [ use_hex_bitmap ? bitmap.to_hex : bitmap.to_bytes, message ]
