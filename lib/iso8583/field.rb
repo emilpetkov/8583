@@ -99,7 +99,8 @@ module ISO8583
       _length = super
       puts "LENGTH FOR BCD: #{_length.inspect}"
       # I suppose there wasn't a case in which the length for a BCD field could be a new codec.
-      # This is a necessary check, otherways (length % 2) raises an error
+      # This is a necessary check, otherways (length % 2) raises an error. So in this case length will
+      # be a Field object, not a Fixnum
       _length = _length.respond_to?(:length) ? _length.length : _length
       puts "NEW LENGTH: #{_length}"
       (_length % 2) != 0 ? (_length / 2) + 1 : _length / 2

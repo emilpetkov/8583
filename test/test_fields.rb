@@ -15,30 +15,44 @@ class FieldTest < Test::Unit::TestCase
 
     enc = LLL.encode 123
     assert_equal "\x31\x32\x33", enc
-    
+
     enc = LLL.encode "123"
     assert_equal "\x31\x32\x33", enc
-    
+
     enc = LLL.encode 12
     assert_equal "\x30\x31\x32", enc
-    
+
     #enc = LLL.encode "012"
     #assert_equal "\x30\x31\x32", enc
 
-    
+
     assert_raise(ISO8583Exception) {
       enc = LLL.encode 1234
     }
-    
+
     assert_raise(ISO8583Exception) {
       enc = LLL.encode "1234"
     }
   end
 
+  def test_LL_EBCDIC
+    encoded_value = LL_EBCDIC.encode('12', nil)
+
+    assert_equal 2, encoded_value.length
+    assert_equal ISO8583.ascii2ebcdic('12'), encoded_value
+  end
+
+  def test_LLL_EBCDIC
+    encoded_value = LLL_EBCDIC.encode('123', nil)
+
+    assert_equal 3, encoded_value.length
+    assert_equal ISO8583.ascii2ebcdic('123'), encoded_value
+  end
+
   def test_LL_BCD
     value, rest = LL_BCD.parse "\x123456"
     assert_equal 12, value
-    assert_equal "3456", rest    
+    assert_equal "3456", rest
   end
 
   def test_LLVAR_AN
@@ -58,17 +72,17 @@ class FieldTest < Test::Unit::TestCase
 
     enc = LLVAR_AN.encode "123A"
     assert_equal "04123A", enc
-    
+
     enc = LLVAR_AN.encode "123ABC123ABC"
     assert_equal "12123ABC123ABC", enc
-    
+
     assert_raise(ISO8583Exception) {
       enc = LLVAR_AN.encode "1234 ABCD"
     }
-    
+
     enc = LLLVAR_AN.encode "123ABC123ABC"
     assert_equal "012123ABC123ABC", enc
-    
+
     assert_raise(ISO8583Exception) {
       enc = LLLVAR_AN.encode "1234 ABCD"
     }
@@ -91,17 +105,17 @@ class FieldTest < Test::Unit::TestCase
 
     enc = LLVAR_N.encode 1234
     assert_equal "041234", enc
-    
+
     enc = LLVAR_N.encode 123412341234
     assert_equal "12123412341234", enc
-    
+
     assert_raise(ISO8583Exception) {
       enc = LLVAR_N.encode "1234ABCD"
     }
-    
+
     enc = LLLVAR_N.encode "123412341234"
     assert_equal "012123412341234", enc
-    
+
     assert_raise(ISO8583Exception) {
       enc = LLLVAR_N.encode "1234ABCD"
     }
@@ -124,8 +138,7 @@ class FieldTest < Test::Unit::TestCase
 
     enc = LLVAR_Z.encode ";123123123=123?5"
     assert_equal "16;123123123=123?5", enc
-    
-    
+
     assert_raise(ISO8583Exception) {
       enc = LLVAR_Z.encode "1234ABCD"
     }
@@ -137,7 +150,7 @@ class FieldTest < Test::Unit::TestCase
     value, rest = fld.parse "abcd"
     assert_equal "abc", value
     assert_equal "d", rest
-    
+
     assert_raise(ISO8583ParseException) {
       fld.parse "ab"
     }
@@ -153,7 +166,7 @@ class FieldTest < Test::Unit::TestCase
     value, rest = fld.parse "1234"
     assert_equal "123", value
     assert_equal "4", rest
-    
+
     assert_raise(ISO8583ParseException) {
       fld.parse "12"
     }
@@ -169,7 +182,7 @@ class FieldTest < Test::Unit::TestCase
     value, rest = fld.parse "1234"
     assert_equal "123", value
     assert_equal "4", rest
-    
+
     assert_raise(ISO8583ParseException) {
       fld.parse "12"
     }
@@ -183,7 +196,7 @@ class FieldTest < Test::Unit::TestCase
     value, rest = fld.parse "1234"
     assert_equal "123", value
     assert_equal "4", rest
-    
+
     assert_raise(ISO8583ParseException) {
       fld.parse "12"
     }
@@ -198,7 +211,7 @@ class FieldTest < Test::Unit::TestCase
     value, rest = fld.parse "\000234"
     assert_equal "\00023", value
     assert_equal "4", rest
-    
+
     assert_raise(ISO8583ParseException) {
       fld.parse "12"
     }
@@ -232,6 +245,6 @@ class FieldTest < Test::Unit::TestCase
 
   def test_YYMMDDhhmmss
     fld = YYMMDDhhmmss
-    assert_equal "740808120000", fld.encode("740808120000")
+    assert_equal "740808120000", fld.encode("740808120000", nil)
   end
 end
