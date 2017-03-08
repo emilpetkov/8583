@@ -97,6 +97,11 @@ module ISO8583
     # content length. E.g. 123 (length = 3) encodes to "\x01\x23" (length 2)
     def length
       _length = super
+      puts "LENGTH FOR BCD: #{_length.inspect}"
+      # I suppose there wasn't a case in which the length for a BCD field could be a new codec.
+      # This is a necessary check, otherways (length % 2) raises an error
+      _length = _length.respond_to?(:length) ? _length.length : _length
+      puts "NEW LENGTH: #{_length}"
       (_length % 2) != 0 ? (_length / 2) + 1 : _length / 2
     end
   end
