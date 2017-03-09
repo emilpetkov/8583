@@ -56,8 +56,12 @@ class FieldTest < Test::Unit::TestCase
 
   def test_LL_EBCDIC_BCD
     encoded_value = LL_EBCDIC_BCD.encode('160203', nil)
+    length = encoded_value.slice(0, 2)
+    payload = encoded_value.slice(2, 5)
 
-    #assert_equal 2, encoded_value.length
+    assert_equal 5, encoded_value.length # 2 bytes EBCDID + 3 bytes BCD
+    assert_equal ISO8583.ascii2ebcdic("03"), length # First two bytes indicate the length of message, which is 3 in BCD
+    assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
   end
 
   def test_LL_BCD
