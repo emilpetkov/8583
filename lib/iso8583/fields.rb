@@ -83,7 +83,7 @@ module ISO8583
   LLLVAR_N        = Field.new
   LLLVAR_N.length = LLL
   LLLVAR_N.codec  = ASCII_Number
-  
+
   # Two byte variable length ASCII numeral, payload Track2 data
   LLVAR_Z         = Field.new
   LLVAR_Z.length  = LL
@@ -207,11 +207,14 @@ module ISO8583
   Field62.codec  = F62_Codec
   Field62.extended_arguments = true
 
-  LL_EBCDIC_BCD = BCDField.new
+  # Although the payload is BCD we probably do not want to use the BCDField class,
+  # as it relies on a Fixnum being provided as a length. It is effective for LL_BCD field,
+  # however when you need to encode the length in a different encoding this causes problems
+  LL_EBCDIC_BCD = Field.new
   LL_EBCDIC_BCD.length = LL_EBCDIC
   LL_EBCDIC_BCD.codec = Packed_Number
 
-  LLL_EBCDIC_BCD = BCDField.new
+  LLL_EBCDIC_BCD = Field.new
   LLL_EBCDIC_BCD.length = LLL_EBCDIC
   LLL_EBCDIC_BCD.codec = Packed_Number
 end

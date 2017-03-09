@@ -1,3 +1,4 @@
+require 'byebug'
 module ISO8583
 
   class Field
@@ -18,12 +19,12 @@ module ISO8583
       "BMP #{bmp}: #{@name}"
     end
 
-    def parse( raw, message )
-      real_value, rest, raw_value = parse_ex( raw, message )
+    def parse(raw, message)
+      real_value, rest, _raw_value = parse_ex(raw, message)
       [ real_value, rest ]
     end
 
-    def parse_ex( raw, message )
+    def parse_ex(raw, message)
       len, raw = case length
                  when Fixnum
                    [length, raw]
@@ -34,7 +35,7 @@ module ISO8583
                  end
 
       raw_value = raw[0,len]
-      
+
       # make sure we have enough data ...
       if raw_value.length != len
         mes = "Field has incorrect length! field: #{raw_value} len/expected: #{raw_value.length}/#{len}; Field name is '#{@name}'"
@@ -43,14 +44,14 @@ module ISO8583
 
       rest = raw[len, raw.length]
       begin
-        real_value = codec.decode( raw_value, @extended_arguments ? message : nil )
+        real_value = codec.decode(raw_value, extended_arguments ? message : nil)
 #      rescue
 #        raise ISO8583ParseException.new($!.message+" (#{name})")
       end
 
-      [ real_value, rest, raw_value ]
+      [real_value, rest, raw_value]
     end
-    
+
 
     # Encoding needs to consider length representation, the actual encoding (such as charset or BCD) 
     # and padding. 
@@ -58,12 +59,11 @@ module ISO8583
     # special treatment, you may need to override this method alltogether.
     # In other cases, the padding has to be implemented by the codec, such as BCD with an odd number of nibbles.
     def encode(value, message)
-      if( @extended_arguments )
+      if( extended_arguments )
         encoded_value = codec.encode(value, message)
       else
         encoded_value = codec.encode(value)
       end
-
       if padding
         if padding.arity == 1
           encoded_value = padding.call(encoded_value)
@@ -71,11 +71,10 @@ module ISO8583
           encoded_value = padding.call(encoded_value, length)
         end
       end
-      
+
       if( encoded_value == nil )
         puts "\n\n\nencoded_value == nil for value = #{value}\n\n\n"
       end
-
       len_str = case length
                 when Fixnum
                   raise ISO8583Exception.new("Too long: #{value} (#{name})! length=#{length}")  if encoded_value.length > length
@@ -97,12 +96,10 @@ module ISO8583
     # content length. E.g. 123 (length = 3) encodes to "\x01\x23" (length 2)
     def length
       _length = super
-      puts "LENGTH FOR BCD: #{_length.inspect}"
       # I suppose there wasn't a case in which the length for a BCD field could be a new codec.
       # This is a necessary check, otherways (length % 2) raises an error. So in this case length will
       # be a Field object, not a Fixnum
       _length = _length.respond_to?(:length) ? _length.length : _length
-      puts "NEW LENGTH: #{_length}"
       (_length % 2) != 0 ? (_length / 2) + 1 : _length / 2
     end
   end
