@@ -64,6 +64,7 @@ module ISO8583
       else
         encoded_value = codec.encode(value)
       end
+
       if padding
         if padding.arity == 1
           encoded_value = padding.call(encoded_value)
@@ -75,6 +76,7 @@ module ISO8583
       if( encoded_value == nil )
         puts "\n\n\nencoded_value == nil for value = #{value}\n\n\n"
       end
+
       len_str = case length
                 when Fixnum
                   raise ISO8583Exception.new("Too long: #{value} (#{name})! length=#{length}")  if encoded_value.length > length

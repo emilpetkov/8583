@@ -36,6 +36,7 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_LL_EBCDIC
+    # The length is always 2 bytes, value is right justified, zeros are added if necessary
     encoded_value = LL_EBCDIC.encode('12', nil)
 
     assert_equal 2, encoded_value.length
@@ -48,10 +49,16 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_LLL_EBCDIC
-    #encoded_value = LLL_EBCDIC.encode('123', nil)
+    # The length is always 3 bytes, value is right justified, zeros are added if necessary
+    encoded_value = LLL_EBCDIC.encode('9', nil)
 
-    #assert_equal 3, encoded_value.length
-    #assert_equal ISO8583.ascii2ebcdic('123'), encoded_value
+    assert_equal 3, encoded_value.length
+    assert_equal ISO8583.ascii2ebcdic('009'), encoded_value
+
+    encoded_value = LLL_EBCDIC.encode('13', nil)
+
+    assert_equal 3, encoded_value.length
+    assert_equal ISO8583.ascii2ebcdic('013'), encoded_value
   end
 
   def test_LL_EBCDIC_BCD

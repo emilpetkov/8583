@@ -39,8 +39,12 @@ module ISO8583
   # [+LLL_EBCDIC+] three byte variable length EBCDIC encoded
 
 
+  PADDING_LEFT_JUSTIFIED_SPACES = lambda {|val, len|
+    sprintf "%-#{len}s", val
+  }
+
   ## Length encodings
-  # Special form to de/encode variable length indicators, two bytes ASCII numerals 
+  # Special form to de/encode variable length indicators, two bytes ASCII numerals
   LL         = Field.new
   LL.name    = "LL"
   LL.length  = 2
@@ -61,13 +65,27 @@ module ISO8583
   LL_EBCDIC  = Field.new
   LL_EBCDIC.length = 2
   LL_EBCDIC.codec = EBCDIC_Codec
-  #LLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
+  LL_EBCDIC.padding = ->(value, len) do
+    if value.length < len
+      "\xF0".force_encoding('ASCII-8BIT') + value
+    else
+      value
+    end
+  end
 
   # Special form to de/encode variable length indicators, three byte variable length EBCDIC encoded
   LLL_EBCDIC = Field.new
   LLL_EBCDIC.length = 3
   LLL_EBCDIC.codec = EBCDIC_Codec
-  #LLLVARN_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_SPACES
+  LLL_EBCDIC.padding = ->(value, len) do
+    if value.length < len
+      len_prefix = ""
+      (len - value.length).times { len_prefix << "\xF0"}
+      len_prefix.force_encoding('ASCII-8BIT') + value
+    else
+      value
+    end
+  end
 
   LL_BCD        = BCDField.new
   LL_BCD.length = 2
@@ -129,10 +147,6 @@ module ISO8583
 
   N_BCD = BCDField.new
   N_BCD.codec = Packed_Number
-
-  PADDING_LEFT_JUSTIFIED_SPACES = lambda {|val, len|
-    sprintf "%-#{len}s", val
-  }
 
   # Fixed length ASCII letters [A-Za-z]
   A = Field.new
