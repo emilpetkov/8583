@@ -1,4 +1,4 @@
-require 'byebug'
+#require 'byebug'
 module ISO8583
 
   class Field
@@ -76,7 +76,7 @@ module ISO8583
       if( encoded_value == nil )
         puts "\n\n\nencoded_value == nil for value = #{value}\n\n\n"
       end
-
+      puts "VALUE: #{value}, ENCODED_VALUE: #{encoded_value}"
       len_str = case length
                 when Fixnum
                   raise ISO8583Exception.new("Too long: #{value} (#{name})! length=#{length}")  if encoded_value.length > length

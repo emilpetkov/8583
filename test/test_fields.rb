@@ -71,6 +71,15 @@ class FieldTest < Test::Unit::TestCase
     assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
   end
 
+  def test_LLL_EBCDIC_ANS
+    encoded_value = LLL_EBCDIC_ANS.encode('80', nil)
+    length = encoded_value.slice(0, 3)
+    payload = encoded_value.slice(3, 5)
+
+    assert_equal ISO8583.ascii2ebcdic('80'), payload
+    assert_equal ISO8583.ascii2ebcdic('002'), length
+  end
+
   def test_LL_BCD
     value, rest = LL_BCD.parse "\x123456", nil
     assert_equal 12, value

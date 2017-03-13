@@ -224,11 +224,24 @@ module ISO8583
   # Although the payload is BCD we probably do not want to use the BCDField class,
   # as it relies on a Fixnum being provided as a length. It is effective for LL_BCD field,
   # however when you need to encode the length in a different encoding this causes problems
+
+  # 2 bytes EBCDIC length, payload in BCD
   LL_EBCDIC_BCD = Field.new
   LL_EBCDIC_BCD.length = LL_EBCDIC
   LL_EBCDIC_BCD.codec = Packed_Number
 
+  # 3 bytes EBCDIC length, payload in BCD
   LLL_EBCDIC_BCD = Field.new
   LLL_EBCDIC_BCD.length = LLL_EBCDIC
   LLL_EBCDIC_BCD.codec = Packed_Number
+
+  # payload in EBCDIC, no length prefix
+  EBCDIC_AN = Field.new
+  EBCDIC_AN.codec = EBCDIC_Codec
+  EBCDIC_AN.padding = PADDING_LEFT_JUSTIFIED_SPACES
+
+  # 3 bytes EBCDIC length, payload in EBCDIC
+  LLL_EBCDIC_ANS = Field.new
+  LLL_EBCDIC_ANS.length = LLL_EBCDIC
+  LLL_EBCDIC_ANS.codec = EBCDIC_Codec
 end
