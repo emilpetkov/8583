@@ -110,9 +110,13 @@ module ISO8583
   PASS_THROUGH_DECODER = lambda{|str|
     str.strip # remove padding
   }
-  
+
   NO_MODIFICATIONS_DECODER = lambda { |str| str }
-  
+
+  No_change_codec = Codec.new
+  No_change_codec.encoder = ->(str) { str }
+  No_change_codec.decoder = ->(str) { str }
+
   # Takes a number or str representation of a number and BCD encodes it, e.g.
   # "1234" => "\x12\x34"
   # 3456   => "\x34\x56"
@@ -180,7 +184,7 @@ module ISO8583
   }
   Track2.decoder = PASS_THROUGH_DECODER
 
-  def self._date_codec(fmt) 
+  def self._date_codec(fmt)
     c = Codec.new
     c.encoder = lambda {|date|
       enc = case date
@@ -193,7 +197,7 @@ module ISO8583
               rescue
                 raise ISO8583Exception.new("Invalid format encoding: #{date}, must be #{fmt}.")
               end
-            else  
+            else
               raise ISO8583Exception.new("Don't know how to encode: #{date.class} to a time.")
             end
       return enc

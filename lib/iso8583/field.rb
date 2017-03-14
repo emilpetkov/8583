@@ -6,11 +6,13 @@ module ISO8583
     # fixed length fields. Length should always be the length of the *encoded* value.
     # A 6 digit BCD field will require a length 3, as will a 5 digit BCD field.
     # The subclass BCDField handles this to keep things consistant.
-    attr_accessor :length
-    attr_accessor :codec
-    attr_accessor :padding
-    attr_accessor :max
-    attr_accessor :extended_arguments
+    attr_accessor :length,
+                  :codec,
+                  :padding,
+                  :max,
+                  :extended_arguments,
+                  :suffix,
+                  :suffix_value
 
     attr_writer   :name
     attr_accessor :bmp
@@ -73,10 +75,16 @@ module ISO8583
         end
       end
 
+      if suffix
+        # ONLY BCD suffix for now
+        # Think about a general solution
+        encoded_value = encoded_value + suffix.encode(suffix_value, message)
+      end
+
       if( encoded_value == nil )
         puts "\n\n\nencoded_value == nil for value = #{value}\n\n\n"
       end
-      puts "VALUE: #{value}, ENCODED_VALUE: #{encoded_value}"
+
       len_str = case length
                 when Fixnum
                   raise ISO8583Exception.new("Too long: #{value} (#{name})! length=#{length}")  if encoded_value.length > length
