@@ -35,15 +35,12 @@ module ISO8583
                  else
                    raise ISO8583Exception.new("Cannot determine the length of '#{name}' field")
                  end
-
       raw_value = raw[0,len]
-
       # make sure we have enough data ...
       if raw_value.length != len
         mes = "Field has incorrect length! field: #{raw_value} len/expected: #{raw_value.length}/#{len}; Field name is '#{@name}'"
         raise ISO8583ParseException.new(mes)
       end
-
       rest = raw[len, raw.length]
       begin
         real_value = codec.decode(raw_value, extended_arguments ? message : nil)

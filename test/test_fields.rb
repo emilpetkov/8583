@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'lib/iso8583'
+require_relative '../lib/iso8583'
 
 include ISO8583
 
@@ -69,6 +69,9 @@ class FieldTest < Test::Unit::TestCase
     assert_equal 5, encoded_value.length # 2 bytes EBCDID + 3 bytes BCD
     assert_equal ISO8583.ascii2ebcdic("03"), length # First two bytes indicate the length of message, which is 3 in BCD
     assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
+
+    value, _rest = LL_EBCDIC_BCD.parse("\xf0\xf3\x16\x02\x03\x04", nil)
+    assert_equal 160203, value
   end
 
   def test_LLL_EBCDIC_ANS

@@ -229,7 +229,7 @@ module ISO8583
     ISO8583.ascii2ebcdic(ascii_str)
   }
   EBCDIC_Codec.decoder = -> (ebcdic_str) {
-    ISO8583.ebcdic2ascii(ebcdic_str)
+    ISO8583.ebcdic2ascii(ebcdic_str).to_i
   }
 
 end

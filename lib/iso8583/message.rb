@@ -1,7 +1,7 @@
 # Copyright 2009 by Tim Becker (tim.becker@kuriostaet.de)
 # MIT License, for details, see the LICENSE file accompaning
 # this distribution
-
+require 'byebug'
 module ISO8583
 
   # The class `Message` defines functionality to describe classes
@@ -358,7 +358,8 @@ module ISO8583
       
       # Parse the bytes `str` returning a message of the defined type.
       def parse(str, use_hex_bitmap = false)
-        message = self.new(nil, use_hex_bitmap)
+        str = str.force_encoding('ASCII-8BIT')
+        message = self.new#(nil, use_hex_bitmap)
         message.mti, rest = _mti_format.parse(str, message)
         bmp, rest = Bitmap.parse(rest, use_hex_bitmap)
         bmp.each { |bit|
