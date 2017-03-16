@@ -16,7 +16,7 @@ class FieldTest < Test::Unit::TestCase
     assert_raise(ISO8583Exception) {
       dt = MMDDhhmmssCodec.decode "1312121212"
     }
-    
+
     assert_raise(ISO8583Exception) {
       dt = MMDDhhmmssCodec.encode "1312121212"
     }
@@ -37,7 +37,7 @@ class FieldTest < Test::Unit::TestCase
     assert_raise(ISO8583Exception) {
       dt = YYMMDDhhmmssCodec.decode "091312121212"
     }
-    
+
     assert_raise(ISO8583Exception) {
       dt = YYMMDDhhmmssCodec.encode "091312121212"
     }
@@ -54,7 +54,7 @@ class FieldTest < Test::Unit::TestCase
     assert_raise(ISO8583Exception) {
       dt = YYMMCodec.decode "0913"
     }
-    
+
     assert_raise(ISO8583Exception) {
       dt = YYMMCodec.encode "0913"
     }
@@ -104,9 +104,7 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_ebcdic_codec
-    #assert_raise(ISO8583Exception) { EBCDIC_Codec.encode(22) }
-
-    assert_equal ISO8583.ascii2ebcdic('01'), EBCDIC_Codec.encode('01')
-    assert_equal ISO8583.ebcdic2ascii("\xf0\xf1"), EBCDIC_Codec.decode("\xf0\xf1")
+    assert_equal "\xf0\xf1".force_encoding('ASCII-8BIT'), EBCDIC_Codec.encode('01')
+    assert_equal 1, EBCDIC_Codec.decode("\xf0\xf1")
   end
 end

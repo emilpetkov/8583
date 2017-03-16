@@ -46,6 +46,11 @@ class FieldTest < Test::Unit::TestCase
 
     assert_equal 2, encoded_value.length
     assert_equal ISO8583.ascii2ebcdic('03'), encoded_value
+
+    value, rest = LL_EBCDIC.parse("\xf2\xf3\xf4", nil)
+
+    assert_equal 23, value
+    assert_equal "\xf4", rest
   end
 
   def test_LLL_EBCDIC
@@ -59,6 +64,11 @@ class FieldTest < Test::Unit::TestCase
 
     assert_equal 3, encoded_value.length
     assert_equal ISO8583.ascii2ebcdic('013'), encoded_value
+
+    value, rest = LLL_EBCDIC.parse("\xf2\xf3\xf4\xf5", nil)
+
+    assert_equal 234, value
+    assert_equal "\xf5", rest
   end
 
   def test_LL_EBCDIC_BCD
@@ -71,6 +81,19 @@ class FieldTest < Test::Unit::TestCase
     assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
 
     value, _rest = LL_EBCDIC_BCD.parse("\xf0\xf3\x16\x02\x03\x04", nil)
+    assert_equal 160203, value
+  end
+
+  def test_LLL_EBCDIC_BCD
+    encoded_value = LLL_EBCDIC_BCD.encode('160203', nil)
+    length = encoded_value.slice(0, 3)
+    payload = encoded_value.slice(3, 6)
+
+    assert_equal 6, encoded_value.length # 3 bytes EBCDID + 3 bytes BCD
+    assert_equal ISO8583.ascii2ebcdic("003"), length # First two bytes indicate the length of message, which is 3 in BCD
+    assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
+
+    value, _rest = LLL_EBCDIC_BCD.parse("\xf0\xf0\xf3\x16\x02\x03\x04", nil)
     assert_equal 160203, value
   end
 
