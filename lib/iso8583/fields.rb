@@ -245,12 +245,19 @@ module ISO8583
   LLL_EBCDIC_ANS.length = LLL_EBCDIC
   LLL_EBCDIC_ANS.codec = EBCDIC_Codec
 
+  # 2 bytes EBCDIC length, payload in EBCDIC
+  LL_EBCDIC_ANS = Field.new
+  LL_EBCDIC_ANS.length = LL_EBCDIC
+  LL_EBCDIC_ANS.codec = EBCDIC_Codec
+
   # 3 bytes EBCDIC length, payload in EBCDIC, suffix in BCD
   LLL_EBCDIC_ANS_SUFFIX = Field.new
   LLL_EBCDIC_ANS_SUFFIX.length = LLL_EBCDIC
   LLL_EBCDIC_ANS_SUFFIX.codec = EBCDIC_Codec
   LLL_EBCDIC_ANS_SUFFIX.suffix = LL_BCD
 
-  NO_CHANGE = Field.new
-  NO_CHANGE.codec = No_change_codec
+  LLL_SUBFIELD_EBCDIC = Field.new
+  LLL_SUBFIELD_EBCDIC.length = LLL_EBCDIC
+  LLL_SUBFIELD_EBCDIC.codec = Subfield_Ebcdic_Codec
+
 end

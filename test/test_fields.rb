@@ -308,4 +308,10 @@ class FieldTest < Test::Unit::TestCase
     fld = YYMMDDhhmmss
     assert_equal "740808120000", fld.encode("740808120000", nil)
   end
+
+  def test_LLL_SUBFIELD_EBCDIC
+    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ 'Indicator for electronic commerce' => '07' }, nil)
+
+    assert_equal encoded_value, electronic_commerce_indicator: '07'
+  end
 end
