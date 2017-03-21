@@ -311,7 +311,10 @@ class FieldTest < Test::Unit::TestCase
 
   def test_LLL_SUBFIELD_EBCDIC
     encoded_value = LLL_SUBFIELD_EBCDIC.encode({ 'Indicator for electronic commerce' => '07' }, nil)
+    assert_equal encoded_value, "\xF0\xF0\xF7\xF0\xF0\xF4\xF4\xF0\xF0\xF7".force_encoding('ASCII-8BIT')
 
-    assert_equal encoded_value, electronic_commerce_indicator: '07'
+    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ 'Indicator for electronic commerce' => '07',
+                                                 'CVV2' => '0299' }, nil)
+    assert_equal encoded_value, "\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9".force_encoding('ASCII-8BIT')
   end
 end

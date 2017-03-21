@@ -25,6 +25,6 @@ module ISO8583
   F60_Codec.decoder = lambda { |raw, message| deserialize_lllxx_subfields(60, F60_numeric_id2subfield, raw, message) }
 
   Subfield_Ebcdic_Codec = Codec.new
-  Subfield_Ebcdic_Codec.encoder = ->(additional_data) { serialize_lll_ebcdic_subfield(additional_data) }
-  Subfield_Ebcdic_Codec.decoder = ->(raw_additional_data) { deserialize_lll_ebcdic_subfield(raw_additional_data) }
+  Subfield_Ebcdic_Codec.encoder = ->(additional_data, message = nil) { serialize_lll_ebcdic_subfield(additional_data) }
+  Subfield_Ebcdic_Codec.decoder = ->(raw_additional_data, message = nil) { deserialize_lll_ebcdic_subfield(raw_additional_data) }
 end

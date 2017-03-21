@@ -120,14 +120,16 @@ module ISO8583
     result_hashmap
   end
 
-  def serialize_lll_ebcdic_subfield(additional_data)
+  def self.serialize_lll_ebcdic_subfield(additional_data)
     "".force_encoding('ASCII-8BIT').tap do |serialized_string|
       additional_data.each do |name, data|
-        number = PAYNETICS_SUBFIELD_DEFINITIONS[name]
+        number = PAYNETICS_SUBFIELD_DEFINITIONS[name][:number]
         # Encode the length of subfield number + data in EBCDIC
         length = LLL_EBCDIC.encode((number + data).length, nil)
         # Encode the subfield number in EBCDIC
         number = LL_EBCDIC.encode(number, nil)
+        # Encode the actual data in the format
+        data = PAYNETICS_SUBFIELD_DEFINITIONS[name][:codec].encode(data)
         # Join the encoded length, encoded subfield number and actual data
         encoded_data = length + number + data
         serialized_string << encoded_data
@@ -135,7 +137,7 @@ module ISO8583
     end
   end
 
-  def deserialize_lll_ebcdic_subfield(raw_additional_data)
+  def self.deserialize_lll_ebcdic_subfield(raw_additional_data)
 
   end
 
