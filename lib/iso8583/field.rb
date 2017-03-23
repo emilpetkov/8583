@@ -1,4 +1,4 @@
-#require 'byebug'
+require 'byebug'
 module ISO8583
 
   class Field

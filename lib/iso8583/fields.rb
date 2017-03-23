@@ -255,7 +255,18 @@ module ISO8583
   LLL_EBCDIC_ANS_SUFFIX.length = LLL_EBCDIC
   LLL_EBCDIC_ANS_SUFFIX.codec = EBCDIC_Codec
   LLL_EBCDIC_ANS_SUFFIX.suffix = LL_BCD
+  LLL_EBCDIC_ANS_SUFFIX.padding = ->(value) do
+    len = 8
+    if value.length < len
+      len_prefix = ""
+      (len - value.length).times { len_prefix << "\xF0"}
+      len_prefix.force_encoding('ASCII-8BIT') + value
+    else
+      value
+    end
+  end
 
+  # 3 bytes EBCDIC length, subfield
   LLL_SUBFIELD_EBCDIC = Field.new
   LLL_SUBFIELD_EBCDIC.length = LLL_EBCDIC
   LLL_SUBFIELD_EBCDIC.codec = Subfield_Ebcdic_Codec

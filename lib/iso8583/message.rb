@@ -116,6 +116,7 @@ module ISO8583
     attr_reader :use_hex_bitmap
     
     attr_reader :parsed_raw_values
+    attr_reader :values
 
     # Instantiate a new instance of this type of Message
     # optionally specifying an mti. 

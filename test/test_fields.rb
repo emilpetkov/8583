@@ -310,11 +310,26 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_LLL_SUBFIELD_EBCDIC
+    # TODO: test parsing and deserializing
     encoded_value = LLL_SUBFIELD_EBCDIC.encode({ 'Indicator for electronic commerce' => '07' }, nil)
     assert_equal encoded_value, "\xF0\xF0\xF7\xF0\xF0\xF4\xF4\xF0\xF0\xF7".force_encoding('ASCII-8BIT')
 
     encoded_value = LLL_SUBFIELD_EBCDIC.encode({ 'Indicator for electronic commerce' => '07',
                                                  'CVV2' => '0299' }, nil)
     assert_equal encoded_value, "\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9".force_encoding('ASCII-8BIT')
+  end
+
+  def test_LLL_EBCDIC_ANS_SUFFIX
+    field = LLL_EBCDIC_ANS_SUFFIX
+    field.suffix_value = 0
+    encoded_value = field.encode('1', nil)
+    # length in EBCDIC, actual data is always 8 bytes, suffix is 2 BCDs
+    assert_equal encoded_value, "\xF0\xF0\xF9\xF0\xF0\xF0\xF0\xF0\xF0\xF0\xF1\x00".force_encoding('ASCII-8BIT')
+
+    field = LLL_EBCDIC_ANS_SUFFIX
+    field.suffix_value = 0
+    value, _rest = field.parse("\xF0\xF0\xF9\xF0\xF0\xF0\xF0\xF0\xF0\xF0\xF1\x00", nil)
+
+    assert_equal value, 1
   end
 end
