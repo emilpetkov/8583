@@ -310,13 +310,15 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_LLL_SUBFIELD_EBCDIC
-    # TODO: test parsing and deserializing
-    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ 'Indicator for electronic commerce' => '07' }, nil)
+    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ electronic_commerce_indicator: '07' }, nil)
     assert_equal encoded_value, "\xF0\xF0\xF7\xF0\xF0\xF4\xF4\xF0\xF0\xF7".force_encoding('ASCII-8BIT')
 
-    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ 'Indicator for electronic commerce' => '07',
-                                                 'CVV2' => '0299' }, nil)
+    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ electronic_commerce_indicator: '07',
+                                                 cvv2: '0299' }, nil)
     assert_equal encoded_value, "\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9".force_encoding('ASCII-8BIT')
+
+    value, _rest = LLL_SUBFIELD_EBCDIC.parse("\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9", nil)
+    assert_equal value, {'Indicator for electronic commerce' => 07, 'CVV2' => 299}
   end
 
   def test_LLL_EBCDIC_ANS_SUFFIX

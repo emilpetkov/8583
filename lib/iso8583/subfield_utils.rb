@@ -138,7 +138,23 @@ module ISO8583
   end
 
   def self.deserialize_lll_ebcdic_subfield(raw_additional_data)
+    #\xF0\xF0\xF4 \xF4\xF0\xF0\xF7 \xF0\xF0\xF6 \xF3\xF0\xF0\xF2\xF9\xF9
+    {}.tap do |deserialized_fields|
+      index = 0
+      length_prefix = PAYNETICS_SUBFIELD_LENGTH_PREFIX
+      while index < raw_additional_data.length
+        length = ISO8583.ebcdic2ascii(raw_additional_data[index...index + length_prefix]).to_i
+        data = raw_additional_data[(index + length_prefix)...(index + length_prefix +length)]
 
+        field_number = ISO8583.ebcdic2ascii(data[0, PAYNETICS_SUBFIELD_NUMBER_LENGTH]).to_i
+        field_definition = PAYNETICS_SUBFIELD_DEFINITIONS.values.detect { |k, _v| k[:number].to_i == field_number }
+        actual_data = field_definition[:codec].decode(data[2, data.length])
+        deserialized_fields[field_definition[:name]] = actual_data
+        subfield_length = data.length + length_prefix
+
+        index += subfield_length
+      end
+    end
   end
 
   def self.array_to_hashmap_fixed_len(hashmap, hashmap_id, raw_array, start_pos, data_len, field_info)

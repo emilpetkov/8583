@@ -75,6 +75,8 @@ module ISO8583
       if suffix
         # ONLY BCD suffix for now
         # Think about a general solution
+        # PROBLEM: This must affect the overall length somehow, because we are
+        # adding additional values
         encoded_value = encoded_value + suffix.encode(suffix_value, message)
       end
 
