@@ -80,8 +80,9 @@ class FieldTest < Test::Unit::TestCase
     assert_equal ISO8583.ascii2ebcdic("03"), length # First two bytes indicate the length of message, which is 3 in BCD
     assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
 
-    value, _rest = LL_EBCDIC_BCD.parse("\xf0\xf3\x16\x02\x03\x04", nil)
+    value, rest = LL_EBCDIC_BCD.parse("\xf0\xf3\x16\x02\x03\x04", nil)
     assert_equal 160203, value
+    assert_equal "\x04", rest
   end
 
   def test_LLL_EBCDIC_BCD
@@ -93,8 +94,9 @@ class FieldTest < Test::Unit::TestCase
     assert_equal ISO8583.ascii2ebcdic("003"), length # First two bytes indicate the length of message, which is 3 in BCD
     assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
 
-    value, _rest = LLL_EBCDIC_BCD.parse("\xf0\xf0\xf3\x16\x02\x03\x04", nil)
+    value, rest = LLL_EBCDIC_BCD.parse("\xf0\xf0\xf3\x16\x02\x03\x04", nil)
     assert_equal 160203, value
+    assert_equal "\x04", rest
   end
 
   def test_LLL_EBCDIC_ANS
@@ -104,6 +106,41 @@ class FieldTest < Test::Unit::TestCase
 
     assert_equal ISO8583.ascii2ebcdic('80'), payload
     assert_equal ISO8583.ascii2ebcdic('002'), length
+
+    value, rest = LLL_EBCDIC_ANS.parse("\xf0\xf0\xf2\xf8\xf0\xf5", nil)
+    assert_equal 80, value
+    assert_equal "\xf5", rest
+  end
+
+  def test_LL_EBCDIC_ANS
+    encoded_value = LL_EBCDIC_ANS.encode('long string with data', nil)
+    length = encoded_value.slice(0, 2)
+    payload = encoded_value.slice(2, encoded_value.length)
+
+    assert_equal ISO8583.ascii2ebcdic('long string with data'), payload
+    assert_equal ISO8583.ascii2ebcdic('21'), length
+
+    value, rest = LL_EBCDIC_ANS.parse("\xf0\xf6\xf0\xf0\xf2\xf8\xf0\xf5\xf7\xf3", nil)
+    assert_equal 2805, value
+    assert_equal "\xf7\xf3", rest
+  end
+
+  def test_EBCDIC_AN
+    codec = EBCDIC_AN
+    codec.length = 8
+    encoded_value = codec.encode('99F30003', nil)
+    assert_equal "\xF9\xF9\xC6\xF3\xF0\xF0\xF0\xF3".force_encoding("ASCII-8BIT"), encoded_value
+
+    value, rest = codec.parse("\xF9\xF9\xC6\xF3\xF0\xF0\xF0\xF3", nil)
+    assert_equal '99F30003', value
+
+    # Note the blanks after the encoded value
+    padding_codec = EBCDIC_AN
+    padding_codec.length = 10
+    encoded_value = padding_codec.encode('99F30003', nil)
+    assert_equal "\xF9\xF9\xC6\xF3\xF0\xF0\xF0\xF3  ".force_encoding("ASCII-8BIT"), encoded_value
+
+    
   end
 
   def test_LL_BCD

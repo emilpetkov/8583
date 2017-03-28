@@ -229,6 +229,9 @@ module ISO8583
     ISO8583.ascii2ebcdic(ascii_str)
   }
   EBCDIC_Codec.decoder = -> (ebcdic_str) {
+    # Do we really need to cast "to_i"?
+    # If we don't this breaks the whole logic of calculating the length
+    # and actual payload of the field. Check the encode method in field.rb
     ISO8583.ebcdic2ascii(ebcdic_str).to_i
   }
 

@@ -14,29 +14,37 @@ module ISO8583
   #
   # The following fields are available:
   #
-  # [+LL+]           special form to de/encode variable length indicators, two bytes ASCII numerals
-  # [+LLL+]          special form to de/encode variable length indicators, two bytes ASCII numerals
-  # [+LL_BCD+]       special form to de/encode variable length indicators, two BCD digits
-  # [+LLVAR_N+]      two byte variable length ASCII numeral, payload ASCII numerals
-  # [+LLLVAR_N+]     three byte variable length ASCII numeral, payload ASCII numerals
-  # [+LLVAR_Z+]      two byte variable length ASCII numeral, payload Track2 data 
-  # [+LLVAR_AN+]    two byte variable length ASCII numeral, payload ASCII
-  # [+LLVAR_ANS+]    two byte variable length ASCII numeral, payload ASCII+special
-  # [+LLLVAR_AN+]   three byte variable length ASCII numeral, payload ASCII
-  # [+LLLVAR_ANS+]   three byte variable length ASCII numeral, payload ASCII+special
-  # [+LLVAR_B+]      Two byte variable length binary payload
-  # [+LLLVAR_B+]     Three byte variable length binary payload
-  # [+A+]            fixed length letters, represented in ASCII
-  # [+N+]            fixed lengh numerals, repesented in ASCII, padding right justified using zeros
-  # [+AN+]          fixed lengh ASCII [A-Za-z0-9], padding left justified using spaces.
-  # [+ANP+]          fixed lengh ASCII [A-Za-z0-9] and space, padding left, spaces
-  # [+ANS+]          fixed length ASCII  [\x20-\x7E], padding left, spaces
-  # [+B+]            binary data, padding left using nulls (0x00)
-  # [+MMDDhhmmss+]   Date, formatted as described in ASCII numerals
-  # [+YYMMDDhhmmss+] Date, formatted as named in ASCII numerals
-  # [+YYMM+]         Expiration Date, formatted as named in ASCII numerals
-  # [+LL_EBCDIC+] two byte variable length EBCDIC encoded
-  # [+LLL_EBCDIC+] three byte variable length EBCDIC encoded
+  # [+LL+]                    special form to de/encode variable length indicators, two bytes ASCII numerals
+  # [+LLL+]                   special form to de/encode variable length indicators, two bytes ASCII numerals
+  # [+LL_BCD+]                special form to de/encode variable length indicators, two BCD digits
+  # [+LLVAR_N+]               two byte variable length ASCII numeral, payload ASCII numerals
+  # [+LLLVAR_N+]              three byte variable length ASCII numeral, payload ASCII numerals
+  # [+LLVAR_Z+]               two byte variable length ASCII numeral, payload Track2 data
+  # [+LLVAR_AN+]              two byte variable length ASCII numeral, payload ASCII
+  # [+LLVAR_ANS+]             two byte variable length ASCII numeral, payload ASCII+special
+  # [+LLLVAR_AN+]             three byte variable length ASCII numeral, payload ASCII
+  # [+LLLVAR_ANS+]            three byte variable length ASCII numeral, payload ASCII+special
+  # [+LLVAR_B+]               Two byte variable length binary payload
+  # [+LLLVAR_B+]              Three byte variable length binary payload
+  # [+A+]                     fixed length letters, represented in ASCII
+  # [+N+]                     fixed lengh numerals, repesented in ASCII, padding right justified using zeros
+  # [+AN+]                    fixed lengh ASCII [A-Za-z0-9], padding left justified using spaces.
+  # [+ANP+]                   fixed lengh ASCII [A-Za-z0-9] and space, padding left, spaces
+  # [+ANS+]                   fixed length ASCII  [\x20-\x7E], padding left, spaces
+  # [+B+]                     binary data, padding left using nulls (0x00)
+  # [+MMDDhhmmss+]            Date, formatted as described in ASCII numerals
+  # [+YYMMDDhhmmss+]          Date, formatted as named in ASCII numerals
+  # [+YYMM+]                  Expiration Date, formatted as named in ASCII numerals
+  # [+LL_EBCDIC+]             two byte variable length EBCDIC encoded
+  # [+LLL_EBCDIC+]            three byte variable length EBCDIC encoded
+  # [+LL_EBCDIC_BCD+]         two bytes EBCDIC length, payload in BCD
+  # [+LLL_EBCDIC_BCD+]        three bytes EBCDIC length, payload in BCD
+  # [+EBCDIC_AN+]             no length prefix, payload is alphanumerical, encoded in EBCDIC
+  # [+LL_EBCDIC_ANS+]         two bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC
+  # [+LLL_EBCDIC_ANS+]        three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC
+  # [+LLL_EBCDIC_ANS_SUFFIX+] three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC + suffix, encoded in 2 bytes BCD.
+  # This is used only for BMP 59 of Paynetics Integration
+  # [+LLL_SUBFIELD_EBCDIC+]   three bytes EBCDIC length, payload is specific for each field. Used only for subfields BMP 60
 
 
   PADDING_LEFT_JUSTIFIED_SPACES = lambda {|val, len|
@@ -235,7 +243,7 @@ module ISO8583
   LLL_EBCDIC_BCD.length = LLL_EBCDIC
   LLL_EBCDIC_BCD.codec = Packed_Number
 
-  # payload in EBCDIC, no length prefix
+  # alphanumerical payload in EBCDIC, no length prefix
   EBCDIC_AN = Field.new
   EBCDIC_AN.codec = EBCDIC_Codec
   EBCDIC_AN.padding = PADDING_LEFT_JUSTIFIED_SPACES
