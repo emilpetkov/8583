@@ -1,4 +1,4 @@
-require 'byebug'
+#require 'byebug'
 module ISO8583
 
   class Field
@@ -36,6 +36,7 @@ module ISO8583
                    raise ISO8583Exception.new("Cannot determine the length of '#{name}' field")
                  end
       raw_value = raw[0,len]
+      #raw_value = raw.byteslice(0,len)
       # make sure we have enough data ...
       if raw_value.length != len
         mes = "Field has incorrect length! field: #{raw_value} len/expected: #{raw_value.length}/#{len}; Field name is '#{@name}'"

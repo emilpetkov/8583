@@ -221,18 +221,28 @@ module ISO8583
   HHMMSSCodec       = _date_codec("%H%M%S")
   MMDDCodec         = _date_codec("%m%d")
 
-
-  EBCDIC_Codec = Codec.new
-  EBCDIC_Codec.encoder = -> (ascii_str) {
+  # Why do we need two codecs? EBCDIC is used for both length encryption
+  # as well as payload encryption. Length must always be cast to integer so the parse logic in
+  # field.rb can actually work (don't even think about trying to change it, you are in a world of hurt).
+  # Regular payload must remain properly decoded, not cast to integer, as this gives funny results. Passing
+  # extra arguments and adding additional if-else checks is ugly and cumbersome.
+  Main_EBCDIC_Encoder = -> (ascii_str) {
     ascii_str = ascii_str.to_s
     raise ISO8583Exception.new("#{ascii_str} must be a valid string") unless ascii_str.is_a?(String)
     ISO8583.ascii2ebcdic(ascii_str)
   }
+
+  EBCDIC_Codec = Codec.new
+  EBCDIC_Codec.encoder = Main_EBCDIC_Encoder
   EBCDIC_Codec.decoder = -> (ebcdic_str) {
-    # Do we really need to cast "to_i"?
-    # If we don't this breaks the whole logic of calculating the length
-    # and actual payload of the field. Check the encode method in field.rb
+    ISO8583.ebcdic2ascii(ebcdic_str)
+  }
+
+  EBCDIC_Length_Codec = Codec.new
+  EBCDIC_Length_Codec.encoder = Main_EBCDIC_Encoder
+  EBCDIC_Length_Codec.decoder = -> (ebcdic_str) {
     ISO8583.ebcdic2ascii(ebcdic_str).to_i
   }
+
 
 end

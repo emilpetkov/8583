@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'lib/iso8583'
+require_relative '../lib/iso8583'
 
 include ISO8583
 
@@ -104,7 +104,8 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_ebcdic_codec
-    assert_equal "\xf0\xf1".force_encoding('ASCII-8BIT'), EBCDIC_Codec.encode('01')
-    assert_equal 1, EBCDIC_Codec.decode("\xf0\xf1")
+    assert_equal "\xf0\xf1\xf2\xf3\xf4".force_encoding('ASCII-8BIT'), EBCDIC_Codec.encode('01234')
+    assert_equal "01", EBCDIC_Codec.decode("\xf0\xf1")
+    assert_equal 123, EBCDIC_Length_Codec.decode("\xf1\xf2\xf3")
   end
 end

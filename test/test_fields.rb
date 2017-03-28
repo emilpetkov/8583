@@ -108,7 +108,7 @@ class FieldTest < Test::Unit::TestCase
     assert_equal ISO8583.ascii2ebcdic('002'), length
 
     value, rest = LLL_EBCDIC_ANS.parse("\xf0\xf0\xf2\xf8\xf0\xf5", nil)
-    assert_equal 80, value
+    assert_equal '80', value
     assert_equal "\xf5", rest
   end
 
@@ -121,7 +121,7 @@ class FieldTest < Test::Unit::TestCase
     assert_equal ISO8583.ascii2ebcdic('21'), length
 
     value, rest = LL_EBCDIC_ANS.parse("\xf0\xf6\xf0\xf0\xf2\xf8\xf0\xf5\xf7\xf3", nil)
-    assert_equal 2805, value
+    assert_equal '002805', value
     assert_equal "\xf7\xf3", rest
   end
 
@@ -133,6 +133,7 @@ class FieldTest < Test::Unit::TestCase
 
     value, rest = codec.parse("\xF9\xF9\xC6\xF3\xF0\xF0\xF0\xF3", nil)
     assert_equal '99F30003', value
+    assert_equal '', rest
 
     # Note the blanks after the encoded value
     padding_codec = EBCDIC_AN
@@ -140,7 +141,10 @@ class FieldTest < Test::Unit::TestCase
     encoded_value = padding_codec.encode('99F30003', nil)
     assert_equal "\xF9\xF9\xC6\xF3\xF0\xF0\xF0\xF3  ".force_encoding("ASCII-8BIT"), encoded_value
 
-    
+    value, rest = padding_codec.parse("\xF9\xF9\xC6\xF3\xF0\xF0\xF0\xF3  ", nil)
+    # What the hell is EBCDIC for empty ??
+    #assert_equal "99F30003  ", value
+    assert_equal '', rest
   end
 
   def test_LL_BCD
@@ -355,7 +359,7 @@ class FieldTest < Test::Unit::TestCase
     assert_equal encoded_value, "\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9".force_encoding('ASCII-8BIT')
 
     value, _rest = LLL_SUBFIELD_EBCDIC.parse("\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9", nil)
-    assert_equal value, {'Indicator for electronic commerce' => 07, 'CVV2' => 299}
+    assert_equal value, {'Indicator for electronic commerce' => '07', 'CVV2' => '0299'}
   end
 
   def test_LLL_EBCDIC_ANS_SUFFIX
@@ -369,6 +373,6 @@ class FieldTest < Test::Unit::TestCase
     field.suffix_value = 0
     value, _rest = field.parse("\xF0\xF0\xF9\xF0\xF0\xF0\xF0\xF0\xF0\xF0\xF1\x00", nil)
 
-    assert_equal value, 1
+    assert_equal value, "00000001\x00"
   end
 end

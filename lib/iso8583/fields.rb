@@ -72,7 +72,7 @@ module ISO8583
   # Special form to de/encode variable length indicators, two byte variable length EBCDIC encoded
   LL_EBCDIC  = Field.new
   LL_EBCDIC.length = 2
-  LL_EBCDIC.codec = EBCDIC_Codec
+  LL_EBCDIC.codec = EBCDIC_Length_Codec
   LL_EBCDIC.padding = ->(value, len) do
     if value.length < len
       "\xF0".force_encoding('ASCII-8BIT') + value
@@ -84,7 +84,7 @@ module ISO8583
   # Special form to de/encode variable length indicators, three byte variable length EBCDIC encoded
   LLL_EBCDIC = Field.new
   LLL_EBCDIC.length = 3
-  LLL_EBCDIC.codec = EBCDIC_Codec
+  LLL_EBCDIC.codec = EBCDIC_Length_Codec
   LLL_EBCDIC.padding = ->(value, len) do
     if value.length < len
       len_prefix = ""
