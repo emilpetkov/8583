@@ -301,10 +301,10 @@ class FieldTest < Test::Unit::TestCase
 
     assert_equal "10 ", fld.encode("10", nil)
     # IMPORTANT!!!
-    # This spec is actually failing, expected result is
-    # ["1! ", "a"] there is a blank space!!!
-    # ANS codec has not been touched, so maybe this is a very old failure
-    assert_equal ["1!", "a"], fld.parse("1! a",nil)
+    # This spec was originally failing.
+    # The length of the field is set to 3, so this means that
+    # "1! a" should be parsed as "1! " and "a" is the rest
+    assert_equal ["1! ", "a"], fld.parse("1! a",nil)
   end
 
   def test_B
