@@ -1,3 +1,9 @@
+* Use Test::Unit to spec behavior, there are worrying, totally
+  untested parts and methods/classes of critical nature
+
+* refactor some of the "Java" code inside
+
+* better class organization, especially for subfields, and related
 
 * mti_required : or something of the sort to indicate which fields are
      required/mirrored/conditional for each message type
