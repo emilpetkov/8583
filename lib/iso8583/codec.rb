@@ -221,6 +221,14 @@ module ISO8583
   HHMMSSCodec       = _date_codec("%H%M%S")
   MMDDCodec         = _date_codec("%m%d")
 
+  Binary_Codec = Codec.new
+  Binary_Codec.encoder = -> (str) {
+    ISO8583.hex2b(str)
+  }
+  Binary_Codec.decoder = -> (bytes) {
+    ISO8583.b2hex(bytes)
+  }
+
   # Why do we need two codecs? EBCDIC is used for both length encryption
   # as well as payload encryption. Length must always be cast to integer so the parse logic in
   # field.rb can actually work (don't even think about trying to change it, you are in a world of hurt).

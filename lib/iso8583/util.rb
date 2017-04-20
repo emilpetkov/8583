@@ -15,6 +15,7 @@ module ISO8583
     r = byte_string.unpack("H*")[0]
     r.length > 1 ? r : "  "
   end
+  module_function :b2hex
 
   #
   # Convert a String containing hex data to
@@ -28,6 +29,7 @@ module ISO8583
     raise ISO8583Exception.new("Uneven number of Hex chars #{hex_string}") unless ( (string.length % 2) == 0)
     [string].pack("H*")
   end
+  module_function :hex2b
 
   def _conv(str, mapping)
     _str = ""
