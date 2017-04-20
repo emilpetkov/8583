@@ -45,6 +45,7 @@ module ISO8583
   # [+LLL_EBCDIC_ANS_SUFFIX+] three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC + suffix, encoded in 2 bytes BCD.
   # This is used only for BMP 59 of Paynetics Integration
   # [+LLL_SUBFIELD_EBCDIC+]   three bytes EBCDIC length, payload is specific for each field. Used only for subfields BMP 60
+  # [+LL_EBCDIC_ANS_44+]      two bytes EBCDIC length, payload ASCII+special. Used for field 44
 
 
   PADDING_LEFT_JUSTIFIED_SPACES = lambda {|val, len|
@@ -75,7 +76,10 @@ module ISO8583
   LL_EBCDIC.codec = EBCDIC_Length_Codec
   LL_EBCDIC.padding = ->(value, len) do
     if value.length < len
-      "\xF0".force_encoding('ASCII-8BIT') + value
+      #"\xF0".force_encoding('ASCII-8BIT') + value
+      len_prefix = ""
+      (len - value.length).times { len_prefix << "\xF0"}
+      len_prefix.force_encoding('ASCII-8BIT') + value
     else
       value
     end
@@ -257,6 +261,11 @@ module ISO8583
   LL_EBCDIC_ANS = Field.new
   LL_EBCDIC_ANS.length = LL_EBCDIC
   LL_EBCDIC_ANS.codec = EBCDIC_Codec
+
+  # 2 bytes EBCDIC length, payload in ASCII, special use case for Paynetics field 44
+  LL_EBCDIC_ANS_44 = Field.new
+  LL_EBCDIC_ANS_44.length = LL_EBCDIC
+  LL_EBCDIC_ANS_44.codec = ANS_Codec
 
   # 3 bytes EBCDIC length, payload in EBCDIC, suffix in BCD
   LLL_EBCDIC_ANS_SUFFIX = Field.new

@@ -113,12 +113,13 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_LL_EBCDIC_ANS
-    encoded_value = LL_EBCDIC_ANS.encode('long string with data', nil)
+    encoded_value = LL_EBCDIC_ANS.encode('Descriptor               Sofia        AF', nil)
     length = encoded_value.slice(0, 2)
     payload = encoded_value.slice(2, encoded_value.length)
 
-    assert_equal ISO8583.ascii2ebcdic('long string with data'), payload
-    assert_equal ISO8583.ascii2ebcdic('21'), length
+    assert_equal "\xF4\xF0\xC4\x85\xA2\x83\x99\x89\x97\xA3\x96\x99@@@@@@@@@@@@@@@\xE2\x96\x86\x89\x81@@@@@@@@\xC1\xC6".force_encoding('ASCII-8BIT'), encoded_value
+    assert_equal ISO8583.ascii2ebcdic('Descriptor               Sofia        AF'), payload
+    assert_equal ISO8583.ascii2ebcdic('40'), length
 
     value, rest = LL_EBCDIC_ANS.parse("\xf0\xf6\xf0\xf0\xf2\xf8\xf0\xf5\xf7\xf3", nil)
     assert_equal '002805', value
