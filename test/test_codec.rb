@@ -108,4 +108,9 @@ class FieldTest < Test::Unit::TestCase
     assert_equal "01", EBCDIC_Codec.decode("\xf0\xf1")
     assert_equal 123, EBCDIC_Length_Codec.decode("\xf1\xf2\xf3")
   end
+
+  def test_binary_codec
+    assert_equal "\x124", Binary_Codec.encode('1234')
+    assert_equal '1234', Binary_Codec.decode("\x124")
+  end
 end
