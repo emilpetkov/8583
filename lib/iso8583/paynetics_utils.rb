@@ -6,6 +6,7 @@ module ISO8583
     cvv2: { name: 'CVV2', number: '30', codec: EBCDIC_Codec},
     electronic_commerce_indicator: { name: 'Indicator for electronic commerce', number: '40', codec: EBCDIC_Codec },
     xid: { name: 'XID', number: '61', codec: Binary_Codec },
-    cardholder_authentication_value: { name: 'Cardholder Authentication Value', number: '62', codec: Binary_Codec }
+    cavv: { name: 'Cardholder Authentication Value', number: '62', codec: Binary_Codec },
+    recurring_payment_indicator: { name: 'Indicator for recurring', number: '41', codec: EBCDIC_Codec }
   }
 end
