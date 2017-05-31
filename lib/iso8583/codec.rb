@@ -229,6 +229,15 @@ module ISO8583
     ISO8583.b2hex(bytes)
   }
 
+  Base64_EBCDIC_Codec = Codec.new
+  Base64_EBCDIC_Codec.encoder = -> (str) {
+    base_decoded = Base64.decode64(str)
+    ISO8583.ascii2ebcdic(base_decoded)
+  }
+  Base64_EBCDIC_Codec.decoder = -> (str) {
+    ISO8583.ebcdic2ascii(str)
+  }
+
   # Why do we need two codecs? EBCDIC is used for both length encryption
   # as well as payload encryption. Length must always be cast to integer so the parse logic in
   # field.rb can actually work (don't even think about trying to change it, you are in a world of hurt).
@@ -251,6 +260,4 @@ module ISO8583
   EBCDIC_Length_Codec.decoder = -> (ebcdic_str) {
     ISO8583.ebcdic2ascii(ebcdic_str).to_i
   }
-
-
 end

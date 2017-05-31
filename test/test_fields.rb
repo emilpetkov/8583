@@ -80,6 +80,14 @@ class FieldTest < Test::Unit::TestCase
     assert_equal ISO8583.ascii2ebcdic("03"), length # First two bytes indicate the length of message, which is 3 in BCD
     assert_equal "\x16\x02\x03", payload # The rest of the message in BCD
 
+
+    # Actual Maestro card
+    encoded_value = LL_EBCDIC_BCD.encode('5450880240000000017', nil)
+    length = encoded_value.slice(0, 2)
+    payload = encoded_value.slice(2, encoded_value.length)
+
+    assert_equal 11, encoded_value.length # 2 bytes EBCDIC + payload
+
     value, rest = LL_EBCDIC_BCD.parse("\xf0\xf3\x16\x02\x03\x04", nil)
     assert_equal 160203, value
     assert_equal "\x04", rest

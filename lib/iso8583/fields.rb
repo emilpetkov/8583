@@ -52,6 +52,21 @@ module ISO8583
     sprintf "%-#{len}s", val
   }
 
+  PADDING_LEFT_JUSTIFIED_ZEROS = -> (value, len) do
+    if value.length < len
+      #"\xF0".force_encoding('ASCII-8BIT') + value
+      len_prefix = ""
+      (len - value.length).times { len_prefix << "\xF0"}
+      len_prefix.force_encoding('ASCII-8BIT') + value
+    else
+      value
+    end
+  end
+
+  TRAILING_F = ->(val) do
+    val + "F" unless val.length == 19 || val.length == 11
+  end
+
   ## Length encodings
   # Special form to de/encode variable length indicators, two bytes ASCII numerals
   LL         = Field.new
@@ -74,30 +89,14 @@ module ISO8583
   LL_EBCDIC  = Field.new
   LL_EBCDIC.length = 2
   LL_EBCDIC.codec = EBCDIC_Length_Codec
-  LL_EBCDIC.padding = ->(value, len) do
-    if value.length < len
-      #"\xF0".force_encoding('ASCII-8BIT') + value
-      len_prefix = ""
-      (len - value.length).times { len_prefix << "\xF0"}
-      len_prefix.force_encoding('ASCII-8BIT') + value
-    else
-      value
-    end
-  end
+  LL_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_ZEROS
 
   # Special form to de/encode variable length indicators, three byte variable length EBCDIC encoded
   LLL_EBCDIC = Field.new
   LLL_EBCDIC.length = 3
   LLL_EBCDIC.codec = EBCDIC_Length_Codec
-  LLL_EBCDIC.padding = ->(value, len) do
-    if value.length < len
-      len_prefix = ""
-      (len - value.length).times { len_prefix << "\xF0"}
-      len_prefix.force_encoding('ASCII-8BIT') + value
-    else
-      value
-    end
-  end
+  LLL_EBCDIC.padding = PADDING_LEFT_JUSTIFIED_ZEROS
+
 
   LL_BCD        = BCDField.new
   LL_BCD.length = 2
@@ -241,6 +240,7 @@ module ISO8583
   LL_EBCDIC_BCD = Field.new
   LL_EBCDIC_BCD.length = LL_EBCDIC
   LL_EBCDIC_BCD.codec = Packed_Number
+  #LL_EBCDIC_BCD.padding = TRAILING_F
 
   # 3 bytes EBCDIC length, payload in BCD
   LLL_EBCDIC_BCD = Field.new

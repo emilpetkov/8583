@@ -1,7 +1,7 @@
 # Copyright 2009 by Tim Becker (tim.becker@kuriostaet.de)
 # MIT License, for details, see the LICENSE file accompaning
 # this distribution
-
+require 'base64'
 module ISO8583
 
   # general utilities
@@ -30,6 +30,18 @@ module ISO8583
     [string].pack("H*")
   end
   module_function :hex2b
+
+  def base642binary(base64_string)
+    base = ::Base64.strict_decode64(base64_string)
+    base.unpack('B*').first
+  end
+  module_function :base642binary
+
+  def binary2base64(binary_string)
+    raw = [binary_string].pack("B*")[0]
+    ::Base64.strict_encode64(raw)
+  end
+  module_function :binary2base64
 
   def _conv(str, mapping)
     _str = ""

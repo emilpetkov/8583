@@ -5,8 +5,9 @@ module ISO8583
   PAYNETICS_SUBFIELD_DEFINITIONS = {
     cvv2: { name: 'CVV2', number: '30', codec: EBCDIC_Codec},
     electronic_commerce_indicator: { name: 'Indicator for electronic commerce', number: '40', codec: EBCDIC_Codec },
-    xid: { name: 'XID', number: '61', codec: Binary_Codec },
-    cavv: { name: 'Cardholder Authentication Value', number: '62', codec: Binary_Codec },
-    recurring_payment_indicator: { name: 'Indicator for recurring', number: '41', codec: EBCDIC_Codec }
+    xid: { name: 'XID', number: '61', codec: No_change_codec },
+    cavv: { name: 'Cardholder Authentication Value', number: '62', codec: No_change_codec },
+    recurring_payment_indicator: { name: 'Indicator for recurring', number: '41', codec: EBCDIC_Codec },
+    ucaf: { name: 'Universal Cardholder Authentication Field', number: '63', codec: EBCDIC_Codec }
   }
 end

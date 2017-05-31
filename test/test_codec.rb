@@ -64,7 +64,7 @@ class FieldTest < Test::Unit::TestCase
 
   def test_A_Codec
     assert_raise(ISO8583Exception) {
-      dt = A_Codec.encode "!!!"
+      A_Codec.encode "!!!"
     }
     assert_equal "bla", AN_Codec.encode("bla")
     assert_equal "bla", AN_Codec.decode("bla")
@@ -72,7 +72,7 @@ class FieldTest < Test::Unit::TestCase
 
   def test_AN_Codec
     assert_raise(ISO8583Exception) {
-      dt = AN_Codec.encode "!!!"
+      AN_Codec.encode "!!!"
     }
     assert_equal "bla", AN_Codec.encode("bla")
     assert_equal "bla", AN_Codec.decode("bla")
@@ -80,10 +80,10 @@ class FieldTest < Test::Unit::TestCase
 
   def test_Track2_Codec
     assert_raise(ISO8583Exception) {
-      dt = Track2.encode "!!!"
+      Track2.encode "!!!"
     }
     assert_raise(ISO8583Exception) {
-      dt = Track2.encode ";12312312=123?5"
+      Track2.encode ";12312312=123?5"
     }
     assert_equal ";123123123=123?5", Track2.encode(";123123123=123?5")
     assert_equal ";123123123=123?5", Track2.decode(";123123123=123?5")
@@ -96,10 +96,10 @@ class FieldTest < Test::Unit::TestCase
     assert_equal "\x02", Packed_Number.encode(2)
     assert_equal "\x02\x55", Packed_Number.encode(0xff)
     assert_raise(ISO8583Exception) {
-      dt = Packed_Number.encode ";12312312=123?5"
+      Packed_Number.encode ";12312312=123?5"
     }
     assert_raise(ISO8583Exception) {
-      dt = Packed_Number.encode "F"
+      Packed_Number.encode "F"
     }
   end
 

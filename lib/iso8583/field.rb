@@ -95,7 +95,6 @@ module ISO8583
                 else
                   raise ISO8583Exception.new("Invalid length (#{length}) for '#{name}' field")
                 end
-
       len_str + encoded_value
     end
   end
