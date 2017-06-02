@@ -86,7 +86,7 @@ class FieldTest < Test::Unit::TestCase
     length = encoded_value.slice(0, 2)
     payload = encoded_value.slice(2, encoded_value.length)
 
-    assert_equal 11, encoded_value.length # 2 bytes EBCDIC + payload
+    assert_equal 12, encoded_value.length # 2 bytes EBCDIC + payload
 
     value, rest = LL_EBCDIC_BCD.parse("\xf0\xf3\x16\x02\x03\x04", nil)
     assert_equal 160203, value
