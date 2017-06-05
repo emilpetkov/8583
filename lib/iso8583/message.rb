@@ -1,7 +1,6 @@
 # Copyright 2009 by Tim Becker (tim.becker@kuriostaet.de)
 # MIT License, for details, see the LICENSE file accompaning
 # this distribution
-#require 'byebug'
 module ISO8583
 
   # The class `Message` defines functionality to describe classes

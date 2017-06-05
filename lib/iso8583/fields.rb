@@ -42,8 +42,8 @@ module ISO8583
   # [+EBCDIC_AN+]             no length prefix, payload is alphanumerical, encoded in EBCDIC
   # [+LL_EBCDIC_ANS+]         two bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC
   # [+LLL_EBCDIC_ANS+]        three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC
+  # This is used only for BMP 57 of Paynetics Integration
   # [+LLL_EBCDIC_ANS_SUFFIX+] three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC + suffix, encoded in 2 bytes BCD.
-  # This is used only for BMP 59 of Paynetics Integration
   # [+LLL_SUBFIELD_EBCDIC+]   three bytes EBCDIC length, payload is specific for each field. Used only for subfields BMP 60
   # [+LL_EBCDIC_ANS_44+]      two bytes EBCDIC length, payload ASCII+special. Used for field 44
 
@@ -53,10 +53,22 @@ module ISO8583
   }
 
   PADDING_LEFT_JUSTIFIED_ZEROS = -> (value, len) do
+    ebcdic_zero = "\xF0"
     if value.length < len
-      #"\xF0".force_encoding('ASCII-8BIT') + value
       len_prefix = ""
-      (len - value.length).times { len_prefix << "\xF0"}
+      (len - value.length).times { len_prefix << ebcdic_zero}
+      len_prefix.force_encoding('ASCII-8BIT') + value
+    else
+      value
+    end
+  end
+
+  PADDING_LEFT_JUSTIFIED_ZEROS_STRICT = ->(value) do
+    ebcdic_zero = "\xF0"
+    len = 8
+    if value.length < len
+      len_prefix = ""
+      (len - value.length).times { len_prefix << ebcdic_zero}
       len_prefix.force_encoding('ASCII-8BIT') + value
     else
       value
@@ -272,16 +284,7 @@ module ISO8583
   LLL_EBCDIC_ANS_SUFFIX.length = LLL_EBCDIC
   LLL_EBCDIC_ANS_SUFFIX.codec = EBCDIC_Codec
   LLL_EBCDIC_ANS_SUFFIX.suffix = LL_BCD
-  LLL_EBCDIC_ANS_SUFFIX.padding = ->(value) do
-    len = 8
-    if value.length < len
-      len_prefix = ""
-      (len - value.length).times { len_prefix << "\xF0"}
-      len_prefix.force_encoding('ASCII-8BIT') + value
-    else
-      value
-    end
-  end
+  LLL_EBCDIC_ANS_SUFFIX.padding = PADDING_LEFT_JUSTIFIED_ZEROS_STRICT
 
   # 3 bytes EBCDIC length, subfield
   LLL_SUBFIELD_EBCDIC = Field.new

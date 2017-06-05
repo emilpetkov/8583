@@ -139,17 +139,25 @@ module ISO8583
 
   def self.deserialize_lll_ebcdic_subfield(raw_additional_data)
     #\xF0\xF0\xF4 \xF4\xF0\xF0\xF7 \xF0\xF0\xF6 \xF3\xF0\xF0\xF2\xF9\xF9
+    # Algorithm to iterate over the serialized fields. Each iteration loops over
+    # one serialized field
     {}.tap do |deserialized_fields|
       index = 0
       length_prefix = PAYNETICS_SUBFIELD_LENGTH_PREFIX
       while index < raw_additional_data.length
+        # Get the length of the field
         length = ISO8583.ebcdic2ascii(raw_additional_data[index...index + length_prefix]).to_i
+        # Get the encoded payload of the field
         data = raw_additional_data[(index + length_prefix)...(index + length_prefix +length)]
 
         field_number = ISO8583.ebcdic2ascii(data[0, PAYNETICS_SUBFIELD_NUMBER_LENGTH]).to_i
         field_definition = PAYNETICS_SUBFIELD_DEFINITIONS.values.detect { |k, _v| k[:number].to_i == field_number }
-        actual_data = field_definition[:codec].decode(data[2, data.length])
+
+        # Decode the payload with the proper codec
+        actual_data = field_definition[:codec].decode(data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, data.length])
+        # Add the deserialized field to the response object
         deserialized_fields[field_definition[:name]] = actual_data
+        # Get the total length of the field and add it to the index for the next iteration
         subfield_length = data.length + length_prefix
 
         index += subfield_length

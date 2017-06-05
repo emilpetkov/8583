@@ -5,7 +5,7 @@ module ISO8583
   require 'iso8583/field'
   require 'iso8583/codec'
   require 'iso8583/subfield_utils'
-  require 'iso8583/paynetics_utils'
+  require 'iso8583/paynetics_bmp_60_utils'
   require 'iso8583/subfield_classes'
   require 'iso8583/subfield_bm44_translations'
   require 'iso8583/subfield_bm44'

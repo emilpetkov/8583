@@ -1,4 +1,3 @@
-#require 'byebug'
 module ISO8583
 
   class Field
@@ -38,7 +37,7 @@ module ISO8583
       raw_value = raw[0,len]
       # make sure we have enough data ...
       if raw_value.length != len
-        mes = "Field has incorrect length! field: #{raw_value} len/expected: #{raw_value.length}/#{len}; Field name is '#{@name}'"
+        mes = "Field has incorrect length! field: #{raw_value} len/expected: #{raw_value.length}/#{len}; Field name is '#{name}'"
         raise ISO8583ParseException.new(mes)
       end
       rest = raw[len, raw.length]
@@ -72,11 +71,10 @@ module ISO8583
         end
       end
 
+      # We are using the suffix for only one field at the moment:
+      # Paynetics BMP 57, Sequence Generation Number. Actually we are not
+      # using it for any purpose, but it is a requirement.
       if suffix
-        # ONLY BCD suffix for now
-        # Think about a general solution
-        # PROBLEM: This must affect the overall length somehow, because we are
-        # adding additional values
         encoded_value = encoded_value + suffix.encode(suffix_value, message)
       end
 

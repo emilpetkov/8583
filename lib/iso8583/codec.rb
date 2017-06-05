@@ -3,7 +3,6 @@
 # this distribution
 
 require 'date'
-#require 'byebug'
 
 module ISO8583
 
@@ -227,15 +226,6 @@ module ISO8583
   }
   Binary_Codec.decoder = -> (bytes) {
     ISO8583.b2hex(bytes)
-  }
-
-  Base64_EBCDIC_Codec = Codec.new
-  Base64_EBCDIC_Codec.encoder = -> (str) {
-    base_decoded = Base64.decode64(str)
-    ISO8583.ascii2ebcdic(base_decoded)
-  }
-  Base64_EBCDIC_Codec.decoder = -> (str) {
-    ISO8583.ebcdic2ascii(str)
   }
 
   # Why do we need two codecs? EBCDIC is used for both length encryption

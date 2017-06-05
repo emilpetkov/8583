@@ -20,10 +20,12 @@ module ISO8583
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  6, 64, :mastercard_assigned_id, "BM60: MasterCard Assigned ID", false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield, 14, 65, :ewallet_data, "BM60: eWallet Data", false)
 
+  # Omnipay specifics
   F60_Codec = Codec.new
   F60_Codec.encoder = lambda { |params_hashtable, message| serialize_lllxx_subfields(60, F60_string_id2subfield, params_hashtable, message) }
   F60_Codec.decoder = lambda { |raw, message| deserialize_lllxx_subfields(60, F60_numeric_id2subfield, raw, message) }
 
+  # Paynetics Specifics
   Subfield_Ebcdic_Codec = Codec.new
   Subfield_Ebcdic_Codec.encoder = ->(additional_data, message = nil) { serialize_lll_ebcdic_subfield(additional_data) }
   Subfield_Ebcdic_Codec.decoder = ->(raw_additional_data, message = nil) { deserialize_lll_ebcdic_subfield(raw_additional_data) }
