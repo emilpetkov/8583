@@ -1,3 +1,4 @@
+require 'byebug'
 module ISO8583
 
   class Field
@@ -11,7 +12,8 @@ module ISO8583
                   :max,
                   :extended_arguments,
                   :suffix,
-                  :suffix_value
+                  :suffix_value,
+                  :odd_requirement
 
     attr_writer   :name
     attr_accessor :bmp
@@ -93,6 +95,16 @@ module ISO8583
                 else
                   raise ISO8583Exception.new("Invalid length (#{length}) for '#{name}' field")
                 end
+
+      # Trailing HEX F
+      # It needs to be added after the length because it should not be
+      # part of the length calculation
+      if odd_requirement && original_value.length % 2 != 0
+        puts "TRYING TO APPEND THE HEX VALUE F to field with value: #{original_value}"
+        # "%X" % 15
+        encoded_value = encoded_value + "%02X" % 15
+      end
+
       len_str + encoded_value
     end
   end
@@ -105,9 +117,11 @@ module ISO8583
       # I suppose there wasn't a case in which the length for a BCD field could be a new codec.
       # This is a necessary check, otherways (length % 2) raises an error. So in this case length will
       # be a Field object, not a Fixnum
-      _length = _length.respond_to?(:length) ? _length.length : _length
+      # This is something else, this is the length of the field length!!!
+      # _length = _length.respond_to?(:length) ? _length.length : _length
+      # Need to find a way to return the Field itself
+      _length = _length.respond_to?(:length) ? original_value.length : _length
       (_length % 2) != 0 ? (_length / 2) + 1 : _length / 2
     end
   end
-
 end

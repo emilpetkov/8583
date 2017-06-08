@@ -128,19 +128,19 @@ module ISO8583
     raise ISO8583Exception.new("Invalid value: #{val} must be numeric!") unless val =~ /^[0-9]*$/
     [val].pack("H*")
   }
-  Packed_Number.decoder = lambda{|encoded|
+  Packed_Number.decoder = lambda {|encoded|
     encoded.unpack("H*")[0].to_i
   }
 
   A_Codec = Codec.new
-  A_Codec.encoder = lambda{|str|
+  A_Codec.encoder = lambda {|str|
     raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-z]") unless str =~ /^[A-Za-z]*$/
     str
   }
   A_Codec.decoder = PASS_THROUGH_DECODER
 
   AN_Codec = Codec.new
-  AN_Codec.encoder = lambda{|str|
+  AN_Codec.encoder = lambda {|str|
     raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-z0-9]") unless str =~ /^[A-Za-z0-9]*$/
     str
   }

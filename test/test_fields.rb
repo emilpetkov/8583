@@ -72,7 +72,9 @@ class FieldTest < Test::Unit::TestCase
   end
 
   def test_LL_EBCDIC_BCD
-    encoded_value = LL_EBCDIC_BCD.encode('160203', nil)
+    codec = LL_EBCDIC_BCD
+    codec.max = 11
+    encoded_value = codec.encode('160203', nil)
     length = encoded_value.slice(0, 2)
     payload = encoded_value.slice(2, 5)
 

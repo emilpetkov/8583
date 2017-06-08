@@ -63,7 +63,7 @@ module ISO8583
     end
   end
 
-  PADDING_LEFT_JUSTIFIED_ZEROS_STRICT = ->(value) do
+  PADDING_LEFT_JUSTIFIED_ZEROS_STRICT = -> (value) do
     ebcdic_zero = "\xF0"
     len = 8
     if value.length < len
@@ -73,10 +73,6 @@ module ISO8583
     else
       value
     end
-  end
-
-  TRAILING_F = ->(val) do
-    val + "F" unless val.length == 19 || val.length == 11
   end
 
   ## Length encodings
@@ -214,7 +210,7 @@ module ISO8583
   YYMM        = Field.new
   YYMM.codec  = YYMMCodec
   YYMM.length = 4
-  
+
   # fields patch
   HHMMSS        = Field.new
   HHMMSS.codec  = HHMMSSCodec
@@ -228,12 +224,12 @@ module ISO8583
   Field44.length = LL
   Field44.codec  = F44_Codec
   Field44.extended_arguments = true
-  
+
   Field60        = Field.new
   Field60.length = LLL
   Field60.codec  = F60_Codec
   Field60.extended_arguments = true
-    
+
   Field61        = Field.new
   Field61.length = LLL
   Field61.codec  = F61_Codec
@@ -248,11 +244,19 @@ module ISO8583
   # as it relies on a Fixnum being provided as a length. It is effective for LL_BCD field,
   # however when you need to encode the length in a different encoding this causes problems
 
-  # 2 bytes EBCDIC length, payload in BCD
+  # 2 bytes EBCDIC length, payload in BCD, odd requirement
+  # Appends a HEX "F" to the payload. Cannot be used with
+  # the next codec, although they seem close
+ # LL_EBCDIC_BCD = Field.new
+ # LL_EBCDIC_BCD.length = LL_EBCDIC
+ # LL_EBCDIC_BCD.codec = Packed_Number
+ # LL_EBCDIC_BCD.odd_requirement = true
+
+  # 2 bytes EBCDIC length, payload in BCD, regular
   LL_EBCDIC_BCD = Field.new
   LL_EBCDIC_BCD.length = LL_EBCDIC
   LL_EBCDIC_BCD.codec = Packed_Number
-  #LL_EBCDIC_BCD.padding = TRAILING_F
+  LL_EBCDIC_BCD.odd_requirement = true
 
   # 3 bytes EBCDIC length, payload in BCD
   LLL_EBCDIC_BCD = Field.new
