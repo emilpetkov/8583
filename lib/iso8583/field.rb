@@ -99,10 +99,13 @@ module ISO8583
       # Trailing HEX F
       # It needs to be added after the length because it should not be
       # part of the length calculation
-      if odd_requirement && original_value.length % 2 != 0
-        puts "TRYING TO APPEND THE HEX VALUE F to field with value: #{original_value}"
+      if odd_requirement && value.length % 2 != 0
+        puts "TRYING TO APPEND THE HEX VALUE F to field with value: #{value}"
         # "%X" % 15
-        encoded_value = encoded_value + "%02X" % 15
+        # "%02X" % 15
+        # num = "0f"
+
+        #encoded_value = encoded_value + "0F"
       end
 
       len_str + encoded_value
@@ -120,7 +123,7 @@ module ISO8583
       # This is something else, this is the length of the field length!!!
       # _length = _length.respond_to?(:length) ? _length.length : _length
       # Need to find a way to return the Field itself
-      _length = _length.respond_to?(:length) ? original_value.length : _length
+      _length = _length.respond_to?(:length) ? _length.length : _length
       (_length % 2) != 0 ? (_length / 2) + 1 : _length / 2
     end
   end

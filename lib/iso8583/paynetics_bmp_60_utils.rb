@@ -8,6 +8,10 @@ module ISO8583
     xid: { name: 'XID', number: '61', codec: No_change_codec },
     cavv: { name: 'Cardholder Authentication Value', number: '62', codec: No_change_codec },
     recurring_payment_indicator: { name: 'Indicator for recurring', number: '41', codec: EBCDIC_Codec },
-    ucaf: { name: 'Universal Cardholder Authentication Field', number: '63', codec: EBCDIC_Codec }
+    ucaf: { name: 'Universal Cardholder Authentication Field', number: '63', codec: EBCDIC_Codec },
+    payment_facilitator_id: { name: 'Payment Facilitator ID', number: '81', codec: Packed_Number },
+    independent_sales_organization: { name: 'Independent Sales Organization', number: '82', codec: Packed_Number },
+    sub_merchant_id: { name: 'Sub Merchant ID', number: '83', codec: EBCDIC_Codec },
+    zip_code: { name: 'Zip Code', number: '84', codec: EBCDIC_Codec }
   }
 end

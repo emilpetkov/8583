@@ -361,26 +361,49 @@ class FieldTest < Test::Unit::TestCase
     assert_equal "740808120000", fld.encode("740808120000", nil)
   end
 
-  def test_LLL_SUBFIELD_EBCDIC
-    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ electronic_commerce_indicator: '07' }, nil)
+  def test_LLL_SUBFIELD_BMP_60
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ electronic_commerce_indicator: '07' }, nil)
     assert_equal encoded_value, "\xF0\xF0\xF7\xF0\xF0\xF4\xF4\xF0\xF0\xF7".force_encoding('ASCII-8BIT')
 
-    encoded_value = LLL_SUBFIELD_EBCDIC.encode({ electronic_commerce_indicator: '07',
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ electronic_commerce_indicator: '07',
                                                  cvv2: '0299' }, nil)
     assert_equal encoded_value, "\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9".force_encoding('ASCII-8BIT')
 
-    value, _rest = LLL_SUBFIELD_EBCDIC.parse("\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9", nil)
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ recurring_payment_indicator: '02' }, nil)
+    assert_equal encoded_value, "\xF0\xF0\xF7\xF0\xF0\xF4\xF4\xF1\xF0\xF2".force_encoding('ASCII-8BIT')
+
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ ucaf: 'jNLN3CUNxntECBNul08SCHQAAAA=' }, nil)
+    assert_equal encoded_value, "\xF0\xF3\xF3\xF0\xF3\xF0\xF6\xF3\x91\xD5\xD3\xD5\xF3\xC3\xE4\xD5\xA7\x95\xA3\xC5\xC3\xC2\xD5\xA4\x93\xF0\xF8\xE2\xC3\xC8\xD8\xC1\xC1\xC1\xC1~".force_encoding('ASCII-8BIT')
+
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ xid: 'MDAwMDAwMDAwMDAxNTQzODgyNFg=', cavv: 'jNLN3CUNxntECBNul08SCHQAAAA=' }, nil)
+    assert_equal encoded_value, "\xF0\xF6\xF6\xF0\xF3\xF0\xF6\xF1MDAwMDAwMDAwMDAxNTQzODgyNFg=\xF0\xF3\xF0\xF6\xF2jNLN3CUNxntECBNul08SCHQAAAA=".force_encoding('ASCII-8BIT')
+
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ payment_facilitator_id: '00001111222',
+                                                 independent_sales_organization: '00003456789' }, nil)
+    assert_equal encoded_value, "\xF0\xF2\xF2\xF0\xF1\xF3\xF8\xF1\x00\x00\x01\x11\x12\"\xF0\xF1\xF3\xF8\xF2\x00\x00\x03Eg\x89".force_encoding('ASCII-8BIT')
+
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ independent_sales_organization: '00003456789' }, nil)
+    assert_equal encoded_value, "\xF0\xF1\xF1\xF0\xF1\xF3\xF8\xF2\x00\x00\x03Eg\x89".force_encoding('ASCII-8BIT')
+
+    value, _rest = LLL_SUBFIELD_BMP_60.parse("\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9", nil)
     assert_equal value, {'Indicator for electronic commerce' => '07', 'CVV2' => '0299'}
+
+    value, _rest = LLL_SUBFIELD_BMP_60.parse("\xF0\xF6\xF6\xF0\xF3\xF0\xF6\xF1MDAwMDAwMDAwMDAxNTQzODgyNFg=\xF0\xF3\xF0\xF6\xF2jNLN3CUNxntECBNul08SCHQAAAA=", nil)
+    assert_equal value, { 'Cardholder Authentication Value' => "jNLN3CUNxntECBNul08SCHQAAAA=",
+                          'XID' => "MDAwMDAwMDAwMDAxNTQzODgyNFg=" }
+
+    value, _rest = LLL_SUBFIELD_BMP_60.parse("\xF0\xF1\xF1\xF0\xF1\xF3\xF8\xF2\x00\x00\x03Eg\x89".force_encoding('ASCII-8BIT'), nil)
+    assert_equal value, { 'Independent Sales Organization' => 3456789 }
   end
 
-  def test_LLL_EBCDIC_ANS_SUFFIX
-    field = LLL_EBCDIC_ANS_SUFFIX
+  def test_LLL_EBCDIC_BMP_57
+    field = LLL_EBCDIC_BMP_57
     field.suffix_value = 0
     encoded_value = field.encode('1', nil)
     # length in EBCDIC, actual data is always 8 bytes, suffix is 2 BCDs
     assert_equal encoded_value, "\xF0\xF0\xF9\xF0\xF0\xF0\xF0\xF0\xF0\xF0\xF1\x00".force_encoding('ASCII-8BIT')
 
-    field = LLL_EBCDIC_ANS_SUFFIX
+    field = LLL_EBCDIC_BMP_57
     field.suffix_value = 0
     value, _rest = field.parse("\xF0\xF0\xF9\xF0\xF0\xF0\xF0\xF0\xF0\xF0\xF1\x00", nil)
 

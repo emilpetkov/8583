@@ -43,9 +43,11 @@ module ISO8583
   # [+LL_EBCDIC_ANS+]         two bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC
   # [+LLL_EBCDIC_ANS+]        three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC
   # This is used only for BMP 57 of Paynetics Integration
-  # [+LLL_EBCDIC_ANS_SUFFIX+] three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC + suffix, encoded in 2 bytes BCD.
-  # [+LLL_SUBFIELD_EBCDIC+]   three bytes EBCDIC length, payload is specific for each field. Used only for subfields BMP 60
-  # [+LL_EBCDIC_ANS_44+]      two bytes EBCDIC length, payload ASCII+special. Used for field 44
+  # [+LLL_EBCDIC_BMP_57+] three bytes EBCDIC length, payload is alphanumerical + special characters, encoded in EBCDIC + suffix, encoded in 2 bytes BCD.
+  # Used only for subfields BMP 60 of Paynetics integration
+  # [+LLL_SUBFIELD_BMP_60+]   three bytes EBCDIC length, payload is specific for each field.
+  # This is used only for BMP 44 of Paynetics Integration
+  # [+LL_EBCDIC_BMP_44+]      two bytes EBCDIC length, payload ASCII+special.
 
 
   PADDING_LEFT_JUSTIFIED_SPACES = lambda {|val, len|
@@ -279,20 +281,20 @@ module ISO8583
   LL_EBCDIC_ANS.codec = EBCDIC_Codec
 
   # 2 bytes EBCDIC length, payload in ASCII, special use case for Paynetics field 44
-  LL_EBCDIC_ANS_44 = Field.new
-  LL_EBCDIC_ANS_44.length = LL_EBCDIC
-  LL_EBCDIC_ANS_44.codec = ANS_Codec
+  LL_EBCDIC_BMP_44 = Field.new
+  LL_EBCDIC_BMP_44.length = LL_EBCDIC
+  LL_EBCDIC_BMP_44.codec = ANS_Codec
 
   # 3 bytes EBCDIC length, payload in EBCDIC, suffix in BCD
-  LLL_EBCDIC_ANS_SUFFIX = Field.new
-  LLL_EBCDIC_ANS_SUFFIX.length = LLL_EBCDIC
-  LLL_EBCDIC_ANS_SUFFIX.codec = EBCDIC_Codec
-  LLL_EBCDIC_ANS_SUFFIX.suffix = LL_BCD
-  LLL_EBCDIC_ANS_SUFFIX.padding = PADDING_LEFT_JUSTIFIED_ZEROS_STRICT
+  LLL_EBCDIC_BMP_57 = Field.new
+  LLL_EBCDIC_BMP_57.length = LLL_EBCDIC
+  LLL_EBCDIC_BMP_57.codec = EBCDIC_Codec
+  LLL_EBCDIC_BMP_57.suffix = LL_BCD
+  LLL_EBCDIC_BMP_57.padding = PADDING_LEFT_JUSTIFIED_ZEROS_STRICT
 
   # 3 bytes EBCDIC length, subfield
-  LLL_SUBFIELD_EBCDIC = Field.new
-  LLL_SUBFIELD_EBCDIC.length = LLL_EBCDIC
-  LLL_SUBFIELD_EBCDIC.codec = Subfield_Ebcdic_Codec
+  LLL_SUBFIELD_BMP_60 = Field.new
+  LLL_SUBFIELD_BMP_60.length = LLL_EBCDIC
+  LLL_SUBFIELD_BMP_60.codec = Subfield_Ebcdic_Codec
 
 end
