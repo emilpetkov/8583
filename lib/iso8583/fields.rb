@@ -257,7 +257,7 @@ module ISO8583
   # 2 bytes EBCDIC length, payload in BCD, regular
   LL_EBCDIC_BCD = Field.new
   LL_EBCDIC_BCD.length = LL_EBCDIC
-  LL_EBCDIC_BCD.codec = Packed_Number
+  LL_EBCDIC_BCD.codec = Packed_Number_Strict
   LL_EBCDIC_BCD.odd_requirement = true
 
   # 3 bytes EBCDIC length, payload in BCD

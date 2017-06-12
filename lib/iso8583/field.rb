@@ -97,18 +97,28 @@ module ISO8583
                 end
 
       # Trailing HEX F
-      # It needs to be added after the length because it should not be
-      # part of the length calculation
-      if odd_requirement && value.length % 2 != 0
-        puts "TRYING TO APPEND THE HEX VALUE F to field with value: #{value}"
-        # "%X" % 15
-        # "%02X" % 15
-        # num = "0f"
-
-        #encoded_value = encoded_value + "0F"
+      # It needs to be added after the length encoding because it should not be
+      # part of the length calculation. This is why it cannot be a part of any codec
+      if odd?(value)
+        encoded_value = add_trailing_hex_for(encoded_value)
       end
 
       len_str + encoded_value
+    end
+
+    private
+
+    def odd?(value)
+      odd_requirement && value.length % 2 != 0
+    end
+
+    def add_trailing_hex_for(encoded_value)
+      bytes = encoded_value.unpack("c*")
+      last_byte = bytes.pop
+      last_byte |= 0xF
+      bytes << last_byte
+      bytes.pack("c*")
+      #new_encoded_value
     end
   end
 

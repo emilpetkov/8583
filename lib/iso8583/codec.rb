@@ -68,7 +68,6 @@ module ISO8583
   class Codec
     attr_accessor :encoder
     attr_accessor :decoder
-
 #    def decode(raw)
 #      decoder.call(raw)
 #    end
@@ -129,6 +128,19 @@ module ISO8583
     [val].pack("H*")
   }
   Packed_Number.decoder = lambda {|encoded|
+    encoded.unpack("H*")[0].to_i
+  }
+
+  # Packed number codec, without any additional manipulation as the one above.
+  # If the value is odd we need to add a HEX value F, HOWEVER THIS NEEDS TO HAPPEN
+  # AFTER THE ENCODING!!!. Check field.rb
+  Packed_Number_Strict = Codec.new
+  Packed_Number_Strict.encoder = lambda { |val|
+    val = val.to_s
+    raise ISO8583Exception.new("Invalid value: #{val} must be numeric!") unless val =~ /^[0-9]*$/
+    [val].pack("H*")
+  }
+  Packed_Number_Strict.decoder = lambda {|encoded|
     encoded.unpack("H*")[0].to_i
   }
 

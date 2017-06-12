@@ -1,6 +1,6 @@
 require 'test/unit'
 require_relative '../lib/iso8583'
-
+require 'byebug'
 include ISO8583
 
 class FieldTest < Test::Unit::TestCase
@@ -89,10 +89,25 @@ class FieldTest < Test::Unit::TestCase
     payload = encoded_value.slice(2, encoded_value.length)
 
     assert_equal 12, encoded_value.length # 2 bytes EBCDIC + payload
+    assert_equal "TP\x88\x02@\x00\x00\x00\x01\x7F".force_encoding('ASCII-8BIT'), payload
+
+    # Actual VISA card
+    encoded_value = LL_EBCDIC_BCD.encode('4018490000000013', nil)
+    length = encoded_value.slice(0, 2)
+    payload = encoded_value.slice(2, encoded_value.length)
+
+    assert_equal 10, encoded_value.length # 2 bytes EBCDIC + payload
+    assert_equal "@\x18I\x00\x00\x00\x00\x13".force_encoding('ASCII-8BIT'), payload
 
     value, rest = LL_EBCDIC_BCD.parse("\xf0\xf3\x16\x02\x03\x04", nil)
     assert_equal 160203, value
     assert_equal "\x04", rest
+
+    value, rest = LL_EBCDIC_BCD.parse("\xf0\xf8@\x18I\x00\x00\x00\x00\x13", nil)
+    assert_equal 4018490000000013, value
+
+    value, rest = LL_EBCDIC_BCD.parse("\xf1\xf0TP\x88\x02@\x00\x00\x00\x01\x7F", nil)
+    assert_equal 5450880240000000017, value
   end
 
   def test_LLL_EBCDIC_BCD
