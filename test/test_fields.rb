@@ -394,11 +394,14 @@ class FieldTest < Test::Unit::TestCase
     assert_equal encoded_value, "\xF0\xF6\xF6\xF0\xF3\xF0\xF6\xF1MDAwMDAwMDAwMDAxNTQzODgyNFg=\xF0\xF3\xF0\xF6\xF2jNLN3CUNxntECBNul08SCHQAAAA=".force_encoding('ASCII-8BIT')
 
     encoded_value = LLL_SUBFIELD_BMP_60.encode({ payment_facilitator_id: '00001111222',
-                                                 independent_sales_organization: '00003456789' }, nil)
+                                                 iso_id: '00003456789' }, nil)
     assert_equal encoded_value, "\xF0\xF2\xF2\xF0\xF1\xF3\xF8\xF1\x00\x00\x01\x11\x12\"\xF0\xF1\xF3\xF8\xF2\x00\x00\x03Eg\x89".force_encoding('ASCII-8BIT')
 
-    encoded_value = LLL_SUBFIELD_BMP_60.encode({ independent_sales_organization: '00003456789' }, nil)
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ iso_id: '00003456789' }, nil)
     assert_equal encoded_value, "\xF0\xF1\xF1\xF0\xF1\xF3\xF8\xF2\x00\x00\x03Eg\x89".force_encoding('ASCII-8BIT')
+
+    encoded_value = LLL_SUBFIELD_BMP_60.encode({ avs_request: '15643768                        Sofia, Bulgaria' }, nil)
+    assert_equal encoded_value, "\xF0\xF5\xF2\xF0\xF4\xF9\xF3\xF1\xF1\xF5\xF6\xF4\xF3\xF7\xF6\xF8@@@@@@@@@@@@@@@@@@@@@@@@\xE2\x96\x86\x89\x81k@\xC2\xA4\x93\x87\x81\x99\x89\x81".force_encoding('ASCII-8BIT')
 
     value, _rest = LLL_SUBFIELD_BMP_60.parse("\xF0\xF1\xF6\xF0\xF0\xF4\xF4\xF0\xF0\xF7\xF0\xF0\xF6\xF3\xF0\xF0\xF2\xF9\xF9", nil)
     assert_equal value, {'Indicator for electronic commerce' => '07', 'CVV2' => '0299'}
