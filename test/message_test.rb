@@ -45,6 +45,17 @@ class MessageTest < Test::Unit::TestCase
     assert_equal 1430, mes.mti
   end
 
+  def test_rescue_standard_error
+    rescued = false
+    begin
+      BerlinMessage.parse("bogus")
+    rescue => _error
+      rescued = true
+    end
+
+    assert rescued
+  end
+
   def test_to_s
     mes     = BerlinMessage.new
     mes.mti = "Network Management Request Response Issuer Gateway or Acquirer Gateway" 
@@ -80,7 +91,7 @@ class MessageTest < Test::Unit::TestCase
     mes[56] = 88888888888
     mes[59] = "I'm you're private data, data for money..."
     mes[64] = "\xF0\xF0\xF0\xF0"
-    
+
     expected = <<-END
 MTI:1814 (Network Management Request Response Issuer Gateway or Acquirer Gateway)
 
@@ -116,7 +127,7 @@ MTI:1814 (Network Management Request Response Issuer Gateway or Acquirer Gateway
 056                            Original Data Elements : 88888888888
 059                         Additional Data - Private : I'm you're private data, data for money...
 064           Message Authentication Code (MAC) Field : \360\360\360\360
-END
+    END
     assert_equal expected, mes.to_s
   end
 
