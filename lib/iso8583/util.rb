@@ -38,7 +38,7 @@ module ISO8583
   module_function :base642binary
 
   def binary2base64(binary_string)
-    raw = [binary_string].pack("B*")[0]
+    raw = [binary_string].pack("B*").first
     ::Base64.strict_encode64(raw)
   end
   module_function :binary2base64
