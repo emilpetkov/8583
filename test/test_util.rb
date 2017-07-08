@@ -5,9 +5,12 @@ include ISO8583
 
 class UtilTest < Test::Unit::TestCase
   def test_hex2b
-    assert_equal "\xab\xcd\x12", hex2b("abcd12")
-    assert_equal "\xab\xcd\x12", hex2b("a b c d 1 2")
-    assert_equal "\xab\xcd\x12", hex2b("ABCD12")
+    # Taken from original gem
+    expected = "\xab\xcd\x12".force_encoding("ASCII-8BIT")
+
+    assert_equal expected, hex2b("abcd12")
+    assert_equal expected, hex2b("a b c d 1 2")
+    assert_equal expected, hex2b("ABCD12")
     assert_raise(ISO8583Exception){
       # non hex
       hex2b("ABCDEFGH")

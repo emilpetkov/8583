@@ -1,7 +1,7 @@
 # Copyright 2009 by Tim Becker (tim.becker@kuriostaet.de)
 # MIT License, for details, see the LICENSE file accompaning
 # this distribution
-
+require 'base64'
 module ISO8583
 
   # general utilities
@@ -15,6 +15,7 @@ module ISO8583
     r = byte_string.unpack("H*")[0]
     r.length > 1 ? r : "  "
   end
+  module_function :b2hex
 
   #
   # Convert a String containing hex data to
@@ -28,6 +29,19 @@ module ISO8583
     raise ISO8583Exception.new("Uneven number of Hex chars #{hex_string}") unless ( (string.length % 2) == 0)
     [string].pack("H*")
   end
+  module_function :hex2b
+
+  def base642binary(base64_string)
+    base = ::Base64.strict_decode64(base64_string)
+    base.unpack('B*').first
+  end
+  module_function :base642binary
+
+  def binary2base64(binary_string)
+    raw = [binary_string].pack("B*").first
+    ::Base64.strict_encode64(raw)
+  end
+  module_function :binary2base64
 
   def _conv(str, mapping)
     _str = ""

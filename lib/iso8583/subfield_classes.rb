@@ -34,7 +34,7 @@ module ISO8583
   end
 
   class FixedSizeXXSubfield
-    
+
     attr_accessor :numeric_id
     attr_accessor :string_id
     attr_accessor :additional_info
@@ -66,7 +66,7 @@ module ISO8583
   end
 
   class LLLXXSubfield
-    
+
     attr_accessor :numeric_id
     attr_accessor :string_id
     attr_accessor :additional_info
@@ -100,9 +100,9 @@ module ISO8583
       l + 3
     end
   end
-  
+
   class LLLXXFixedSizeSubfield < FixedSizeXXSubfield
-    
+
     def serialize(subfield_value)
       lll = "%03d" % (@fixed_size + 2)
       field_id_dd = "%02d" % @numeric_id
