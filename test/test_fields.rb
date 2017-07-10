@@ -1,6 +1,5 @@
 require 'test/unit'
 require_relative '../lib/iso8583'
-require 'byebug'
 include ISO8583
 
 class FieldTest < Test::Unit::TestCase
@@ -326,10 +325,6 @@ class FieldTest < Test::Unit::TestCase
     }
 
     assert_equal "10 ", fld.encode("10", nil)
-    # IMPORTANT!!!
-    # This spec was originally failing.
-    # The length of the field is set to 3, so this means that
-    # "1! a" should be parsed as "1! " and "a" is the rest
     assert_equal ["1! ", "a"], fld.parse("1! a",nil)
   end
 

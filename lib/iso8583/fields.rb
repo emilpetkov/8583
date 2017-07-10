@@ -246,14 +246,6 @@ module ISO8583
   # as it relies on a Fixnum being provided as a length. It is effective for LL_BCD field,
   # however when you need to encode the length in a different encoding this causes problems
 
-  # 2 bytes EBCDIC length, payload in BCD, odd requirement
-  # Appends a HEX "F" to the payload. Cannot be used with
-  # the next codec, although they seem close
- # LL_EBCDIC_BCD = Field.new
- # LL_EBCDIC_BCD.length = LL_EBCDIC
- # LL_EBCDIC_BCD.codec = Packed_Number
- # LL_EBCDIC_BCD.odd_requirement = true
-
   # 2 bytes EBCDIC length, payload in BCD, regular
   LL_EBCDIC_BCD = Field.new
   LL_EBCDIC_BCD.length = LL_EBCDIC

@@ -117,7 +117,6 @@ module ISO8583
       last_byte |= 0xF
       bytes << last_byte
       bytes.pack("c*")
-      #new_encoded_value
     end
   end
 
