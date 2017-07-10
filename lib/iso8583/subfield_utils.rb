@@ -48,14 +48,14 @@ module ISO8583
       field_raw_data += encoded_subfield
       index += subfield_def.subfield_length
      end
-    
+
     if( identified_subfields != params_hashtable.length )
         raise ArgumentError.new "BM #{field_number} arguments hashmap has unparsed elements. Identified subfields '#{identified_subfields}'. Elements in hashmap: #{params_hashtable.length}"
     end
-    
+
     field_raw_data
   end
-    
+
   def self.deserialize_fixed_subfields(field_number, string_id2subfield, raw_src, message)
     result_hashmap = Hash.new
     index = 0
@@ -77,7 +77,7 @@ module ISO8583
   def self.serialize_lllxx_subfields(field_number, string_id2subfield, params_hashtable, message)
     identified_subfields = 0
     field_raw_data = ""
-    
+
     params_hashtable.keys.sort_by { |key| key.to_s }.each do 
       |subfield_string_id|
       subfield_value = params_hashtable[subfield_string_id]
@@ -86,18 +86,18 @@ module ISO8583
         raise ArgumentError.new "BM #{field_number} Unknown subfield with id '#{subfield_string_id}' and value '#{subfield_value.to_s}'"
       end
       encoded_subfield = subfield_def.serialize( subfield_value )
-      
+
       identified_subfields += 1
       field_raw_data = field_raw_data + encoded_subfield
      end
-    
+
     if( identified_subfields != params_hashtable.length )
         raise ArgumentError.new "BM #{field_number} arguments hashmap has unparsed elements. Identified subfields '#{identified_subfields}'. Elements in hashmap: #{params_hashtable.length}"
     end
-    
+
     field_raw_data
   end
-    
+
   def self.deserialize_lllxx_subfields(field_number, numeric_id2subfield, raw_src, message)
     result_hashmap = Hash.new
     index = 0
@@ -108,16 +108,61 @@ module ISO8583
       rest = raw_src[ index .. raw_src.length - 1 ]
       subfield_id = raw_src[index+3 .. index+4].to_i
       subfield_def = numeric_id2subfield[ subfield_id ]
-      
+
       if( subfield_def == nil )
         raise ArgumentError.new "BM #{field_number} Unknown subfield with id '#{subfield_id}', index='#{index}', rest='#{rest}'"
       end
-      
+
       subfield_length = subfield_def.deserialize( result_hashmap, rest  )
       index += subfield_length # 2 is for the prefix
     end # while
 
     result_hashmap
+  end
+
+  def self.serialize_lll_ebcdic_subfield(additional_data)
+    "".force_encoding('ASCII-8BIT').tap do |serialized_string|
+      additional_data.each do |name, data|
+        number = PAYNETICS_SUBFIELD_DEFINITIONS[name][:number]
+        # Encode the length of subfield number + data in EBCDIC
+        length = LLL_EBCDIC.encode((number + data).length, nil)
+        # Encode the subfield number in EBCDIC
+        number = LL_EBCDIC.encode(number, nil)
+        # Encode the actual data in the format
+        data = PAYNETICS_SUBFIELD_DEFINITIONS[name][:codec].encode(data)
+        # Join the encoded length, encoded subfield number and actual data
+        encoded_data = length + number + data
+        serialized_string << encoded_data
+      end
+    end
+  end
+
+  def self.deserialize_lll_ebcdic_subfield(raw_additional_data)
+    #\xF0\xF0\xF4 \xF4\xF0\xF0\xF7 \xF0\xF0\xF6 \xF3\xF0\xF0\xF2\xF9\xF9
+    # Algorithm to iterate over the serialized fields. Each iteration loops over
+    # one serialized field
+    {}.tap do |deserialized_fields|
+      index = 0
+      length_prefix = PAYNETICS_SUBFIELD_LENGTH_PREFIX
+      while index < raw_additional_data.length
+        # Get the length of the field
+        length = ISO8583.ebcdic2ascii(raw_additional_data[index...index + length_prefix]).to_i
+        # Get the encoded payload of the field
+        data = raw_additional_data[(index + length_prefix)...(index + length_prefix +length)]
+
+        field_number = ISO8583.ebcdic2ascii(data[0, PAYNETICS_SUBFIELD_NUMBER_LENGTH]).to_i
+        field_definition = PAYNETICS_SUBFIELD_DEFINITIONS.values.detect { |k, _v| k[:number].to_i == field_number }
+
+        # Decode the payload with the proper codec
+        actual_data = field_definition[:codec].decode(data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, data.length])
+        # Add the deserialized field to the response object
+        deserialized_fields[field_definition[:name]] = actual_data
+        # Get the total length of the field and add it to the index for the next iteration
+        subfield_length = data.length + length_prefix
+
+        index += subfield_length
+      end
+    end
   end
 
   def self.array_to_hashmap_fixed_len(hashmap, hashmap_id, raw_array, start_pos, data_len, field_info)
@@ -127,12 +172,12 @@ module ISO8583
     hashmap[hashmap_id] = raw_array[start_pos..(start_pos + data_len - 1)] 
     start_pos + data_len
   end
-  
+
   def self.value_to_array(src, raw_array, start_pos, data_len, field_info, mandatory)
     if raw_array.length < (start_pos + data_len)
       raise ArgumentError.new("#{field_info}: No space in raw array to src value, arr_len=#{raw_array.length}, data_end_pos=#{start_pos + data_len}")
     end
-    
+
     unless src or src.length < 1
       if mandatory
         raise ArgumentError.new("#{field_info}: mandatory field is not filled")
@@ -141,31 +186,31 @@ module ISO8583
         return
       end
     end
-    
+
     if src.length != data_len
       raise ArgumentError.new("#{field_info}: src_field_length=#{src.length}; dst_field_length=#{data_len}; src='#{src}'")
     end
-    
+
     raw_array[start_pos..(start_pos + data_len - 1)] = src
   end
-  
+
   def self.xx_value_to_array(raw_array, data_len, subfield_num_id1, subfield_str_id1, field_info1, mandatory)
     if (not raw_array) && (not mandatory)
       return ""
     end
-    
+
     if( subfield_num_id1 < 0 || subfield_num_id1 > 99 )
       raise ArgumentError.new("#{field_info1} (subfield_id=#{subfield_num_id1}/#{subfield_str_id1}): subfield_id is not in range 00-99")
     end
-    
+
     subfield_id2 = (subfield_num_id1 < 10 ? "0" : "") + subfield_num_id1.to_s
-    
+
     field_info2 = (field_info2 ? field_info2 + " " : "") + "(subfield_id=#{subfield_num_id1}/#{subfield_str_id1})"
-    
+
     if data_len != raw_array.length
       raise ArgumentError.new("#{field_info1} (subfield_id=#{subfield_num_id1}/#{subfield_str_id1}): provided data length(#{raw_array.length}) differs from required length(#{data_len}). Value is '#{raw_array}'")
     end
-    
+
     subfield_id2 + raw_array
   end
   
