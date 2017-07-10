@@ -1,3 +1,21 @@
+0.2.0
+==========
+  Adds support for the Paynetic integration. New fields, codecs and tests.
+0.1.19
+==========
+  Updates the bin lists
+0.1.18
+==========
+  Updates the bin lists
+0.1.17
+==========
+  Updates the bin lists
+0.1.16
+==========
+  Updates the bin lists
+0.1.15
+==========
+  Updates the bin lists
 0.1.14
 ==========
   Fixed more issues with the LLLXXSubfield deserialization
