@@ -1,3 +1,15 @@
+0.2.4
+==========
+  Added support for Merchant Verification Value (MVV) in BM 62.20
+0.2.3
+==========
+  Updates the bin lists
+0.2.2
+==========
+  Updates the bin lists
+0.2.1
+==========
+  Updates the bin lists
 0.2.0
 ==========
   Adds support for the Paynetic integration. New fields, codecs and tests.
