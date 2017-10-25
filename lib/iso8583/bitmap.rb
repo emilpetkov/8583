@@ -25,8 +25,8 @@ module ISO8583
     end
     
     # yield once with the number of each set field.
-    def each #:yields: each bit set in the bitmap.
-      @bmp.each_with_index {|set, i| yield i+1 if set}
+    def each #:yields: each bit set in the bitmap. Except for the first bit which is used to determine the bitmap sizec
+      @bmp.each_with_index {|set, i| yield i+1 if set && i != 0}
     end
     
     # Returns whether the bit is set or not.
@@ -57,7 +57,12 @@ module ISO8583
     
     # Generate the hex values representing this bitmap.
     def to_hex
-      "%02x" % self.to_s.to_i(2)
+      hex_message_len = if self[1]
+        128/4
+      else
+        64/4
+      end
+      ("%02x" % self.to_s.to_i(2)).rjust( hex_message_len, '0' ) # fill the message with padding zeros, when message low values does not exist
     end
     
     # Generate the bytes representing this bitmap.
