@@ -1,3 +1,70 @@
+0.2.5
+==========
+  Added support for Merchant reference number in BMP 60.35
+0.2.4
+==========
+  Added support for Merchant Verification Value (MVV) in BM 62.20
+0.2.3
+==========
+  Updates the bin lists
+0.2.2
+==========
+  Updates the bin lists
+0.2.1
+==========
+  Updates the bin lists
+0.2.0
+==========
+  Adds support for the Paynetic integration. New fields, codecs and tests.
+0.1.19
+==========
+  Updates the bin lists
+0.1.18
+==========
+  Updates the bin lists
+0.1.17
+==========
+  Updates the bin lists
+0.1.16
+==========
+  Updates the bin lists
+0.1.15
+==========
+  Updates the bin lists
+0.1.14
+==========
+  Fixed more issues with the LLLXXSubfield deserialization
+0.1.13
+==========
+  Fixed a bug in the LLLXXSubfield deserialization
+0.1.12
+==========
+  Added support for BM60.65, ewallet data
+0.1.11
+==========
+  Dropped support for BM60.92, scheme reference data
+0.1.10
+==========
+  Updated bins mapping on new latest ExactBins DB
+0.1.9
+==========
+  Added some Maestro bins to the bins mapping
+0.1.8
+==========
+  Added 2 series bin for Mastercard
+  BM62 is not a proper LLLVAR...999 variable field
+0.1.7
+==========
+  Minor fixes in card brands and BM 44
+0.1.6
+==========
+  Fixes, Cleanup, New custom bitmaps (BM 44, BM 60, BM 62)
+0.1.5
+==========
+  Hexmap support, string to id mapping
+0.1.4
+==========
+  New subfield classes, utility handling, codes
 0.1.3
 ==========
   bugfix, field definitions not duplicated
