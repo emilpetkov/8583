@@ -1,3 +1,6 @@
+0.3.0
+==========
+  Added support for Staged Digital Wallet Transaction in BMP 61.18
 0.2.5
 ==========
   Added support for Merchant reference number in BMP 60.35
