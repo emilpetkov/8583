@@ -4,4 +4,3 @@ pkg/
 tmp/
 /nbproject/
 .idea
-Gemfile.lock
