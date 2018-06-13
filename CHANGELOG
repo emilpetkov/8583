@@ -1,3 +1,6 @@
+0.3.4
+==========
+  Added support for COF Indicator in BMP 60.49
 0.3.3
 ==========
   Added support for Merchant Initiated Transaction Indicator in BMP 60.50
