@@ -1,7 +1,7 @@
 module ISO8583
 
   class Field
-    # may either be some other Field in which the length is encoded or a Fixnum for
+    # may either be some other Field in which the length is encoded or a Integer for
     # fixed length fields. Length should always be the length of the *encoded* value.
     # A 6 digit BCD field will require a length 3, as will a 5 digit BCD field.
     # The subclass BCDField handles this to keep things consistant.
@@ -28,7 +28,7 @@ module ISO8583
 
     def parse_ex(raw, message)
       len, raw = case length
-                 when Fixnum
+                 when Integer
                    [length, raw]
                  when Field
                    length.parse(raw, message)
@@ -52,9 +52,9 @@ module ISO8583
     end
 
 
-    # Encoding needs to consider length representation, the actual encoding (such as charset or BCD) 
-    # and padding. 
-    # The order may be important! This impl calls codec.encode and then pads, in case you need the other 
+    # Encoding needs to consider length representation, the actual encoding (such as charset or BCD)
+    # and padding.
+    # The order may be important! This impl calls codec.encode and then pads, in case you need the other
     # special treatment, you may need to override this method alltogether.
     # In other cases, the padding has to be implemented by the codec, such as BCD with an odd number of nibbles.
     def encode(value, message)
@@ -84,7 +84,7 @@ module ISO8583
       end
 
       len_str = case length
-                when Fixnum
+                when Integer
                   raise ISO8583Exception.new("Too long: #{value} (#{name})! length=#{length}")  if encoded_value.length > length
                   raise ISO8583Exception.new("Too short: #{value} (#{name})! length=#{length}") if encoded_value.length < length
                   "".force_encoding('ASCII-8BIT')
@@ -127,7 +127,7 @@ module ISO8583
       _length = super
       # I suppose there wasn't a case in which the length for a BCD field could be a new codec.
       # This is a necessary check, otherways (length % 2) raises an error. So in this case length will
-      # be a Field object, not a Fixnum
+      # be a Field object, not a Integer
       # This is something else, this is the length of the field length!!!
       # _length = _length.respond_to?(:length) ? _length.length : _length
       # Need to find a way to return the Field itself
