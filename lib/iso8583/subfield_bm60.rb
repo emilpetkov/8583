@@ -9,6 +9,7 @@ module ISO8583
   LLLXXSubfield.new.set_subfield(         F60_numeric_id2subfield, F60_string_id2subfield,     35, :merchant_post_code,                       'BM60.35: Merchant Post Code', false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield, 29, 37, :dynamic_currency_conversion_data,         'BM60.37: Dynamic Currency Conversion (DCC) Data', false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  2, 40, :electronic_commerce_indicator,            'BM60.40: Electronic Commerce Indicator (ECI)', false)
+  LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  1, 49, :cof_indicator,                            'BM60.49: COF originator indicator', false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  2, 50, :merchant_initiated_transaction_indicator, 'BM60.50: Merchant Initiated Transaction Indicator', false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  1, 51, :recurring_payment_indicator,              'BM60.51: Recurring Payment Indicator', false)
   LLLXXFixedSizeSubfield.new.set_subfield(F60_numeric_id2subfield, F60_string_id2subfield,  2, 52, :recurring_payment_response,               'BM60.52: Recurring Payment Response', false, BM60::RECURRING_PAYMENT_RESPONSE_TRANSLATION)
