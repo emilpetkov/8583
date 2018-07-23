@@ -1,3 +1,6 @@
+0.3.7
+==========
+  Replaced Fixnum with Integer
 0.3.6
 ==========
   Added support for Unique Transaction Identifier in BMP 61.41
