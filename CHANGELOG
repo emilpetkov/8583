@@ -1,6 +1,12 @@
-0.3.5
+0.3.7
 ==========
   Replaced Fixnum with Integer
+0.3.6
+==========
+  Added support for Unique Transaction Identifier in BMP 61.41
+0.3.5
+==========
+  Renamed staged_digital_wallet_transaction to related_transaction_data for BMP 61.18
 0.3.4
 ==========
   Added support for COF Indicator in BMP 60.49
