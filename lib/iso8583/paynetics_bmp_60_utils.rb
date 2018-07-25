@@ -6,6 +6,7 @@ module ISO8583
     cvv2:                          { name: 'CVV2', number: '30', codec: EBCDIC_Codec},
     avs_request:                   { name: 'Address Verification Data Request', number: '31', codec: EBCDIC_Codec},
     avs_response:                  { name: 'Address Verification Data Response', number: '32', codec: EBCDIC_Codec},
+    merchant_reference_number:     { name: 'Merchant reference number', number: '35', codec: EBCDIC_Codec},
     electronic_commerce_indicator: { name: 'Indicator for electronic commerce', number: '40', codec: EBCDIC_Codec },
     xid:                           { name: 'XID', number: '61', codec: No_change_codec },
     cavv:                          { name: 'Cardholder Authentication Value', number: '62', codec: No_change_codec },

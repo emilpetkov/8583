@@ -9,7 +9,7 @@ module ISO8583
   # This file contains a number of preinstantiated Field definitions. You
   # will probably need to create own fields in your implementation, please
   # see Field and Codec for further discussion on how to do this.
-  # The fields currently available are those necessary to implement the 
+  # The fields currently available are those necessary to implement the
   # Berlin Groups Authorization Spec.
   #
   # The following fields are available:
@@ -243,7 +243,7 @@ module ISO8583
   Field62.extended_arguments = true
 
   # Although the payload is BCD we probably do not want to use the BCDField class,
-  # as it relies on a Fixnum being provided as a length. It is effective for LL_BCD field,
+  # as it relies on a Integer being provided as a length. It is effective for LL_BCD field,
   # however when you need to encode the length in a different encoding this causes problems
 
   # 2 bytes EBCDIC length, payload in BCD, regular

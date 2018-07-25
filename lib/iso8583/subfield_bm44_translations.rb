@@ -1,8 +1,8 @@
 module ISO8583
-  module BM44 
-    
+  module BM44
+
     NO_INFO = nil
-    
+
     MASTERCARD_RESULT_CODE_TRANSLATION = {
       " " => NO_INFO,
 			"M" => "CVC2 match",
@@ -25,7 +25,7 @@ module ISO8583
       "A" => "Response provided by a third-party authorizing agent (POS Check)",
       " " => NO_INFO
     }
-    
+
     VISA_AVR_CODE_TRANSLATION = {
       "A" => "Address matches, ZIP does not",
       "B" => "Address matches, ZIP not verified due to incompatible format",
@@ -43,37 +43,37 @@ module ISO8583
       "Z" => "ZIP matches, address does not",
       " " => NO_INFO
     }
-    
+
     VISA_RESERVED3_TRANSLATION = {
       " " => NO_INFO
     }
-    
+
     VISA_CARD_PRODUCT_TYPE_TRANSLATION = {
       " " => NO_INFO
     }
-    
+
     VISA_CVV_RESULT_CODE_TRANSLATION = {
-      "1" => "CVV/dCVV failed verification", 
+      "1" => "CVV/dCVV failed verification",
       "2" => "CVV/dCVV passed verification",
       " " => "CVV/dCVV not verified or fill for subsequent positions that are present"
     }
-    
+
     VISA_PACM_DIVERSION_LEVEL_TRANSLATION = {
       " " => NO_INFO
     }
-    
+
     VISA_PACM_REASON_CODE_TRANSLATION = {
       " " => NO_INFO
     }
-    
+
     VISA_RESERVED8_TRANSLATION = {
-      
+
     }
-    
+
     VISA_CARD_AUTHENTICATION_RESULT_CODE_TRANSLATION = {
       " " => NO_INFO
     }
-    
+
     VISA_CVV2_RESULT_CODE_TRANSLATION = {
       " " => NO_INFO,
 			"M" => "CVC2 match",
@@ -81,16 +81,16 @@ module ISO8583
 			"P" => "Not Processed",
       "S" => "The CVV2 should be on the card, but the merchant indicates it is not"
     }
-    
+
     VISA_ORIGINAL_RESPONSE_CODE_TRANSLATION = {
       " " => NO_INFO
     }
-    
-    VISA_CHECK_SETTLMENT_CODE_TRANSLATION = {
+
+    VISA_CHECK_SETTLEMENT_CODE_TRANSLATION = {
 			"1" => "VISA settlement code",
       "2" => "ACH settlement code"
     }
-    
+
     VISA_CAVV_RESULT_CODE_TRANSLATION = {
       " " => "CAVV not present",
       "0" => "CAVV not validated due to erroneous data submitted",
@@ -108,9 +108,9 @@ module ISO8583
       "C" => "CAVV was not validated – attempt. The issuer did not return a CAVV results code in the authorization response",
       "D" => "CAVV was not validated – authentication. The issuer did not return a CAVV results code in the authorization response"
     }
-    
+
     VISA_RESPONSE_REASON_CODE_TRANSLATION = {
-      
+
     }
   end
 end

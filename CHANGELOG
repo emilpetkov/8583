@@ -1,3 +1,30 @@
+0.3.7
+==========
+  Replaced Fixnum with Integer
+0.3.6
+==========
+  Added support for Unique Transaction Identifier in BMP 61.41
+0.3.5
+==========
+  Renamed staged_digital_wallet_transaction to related_transaction_data for BMP 61.18
+0.3.4
+==========
+  Added support for COF Indicator in BMP 60.49
+0.3.3
+==========
+  Added support for Merchant Initiated Transaction Indicator in BMP 60.50
+0.3.2
+==========
+  Updates the bin lists
+0.3.1
+==========
+  Fixed order in BM 44 subfield. Numbered all subfields for better reference.
+0.3.0
+==========
+  Added support for Staged Digital Wallet Transaction in BMP 61.18
+0.2.5
+==========
+  Added support for Merchant reference number in BMP 60.35
 0.2.4
 ==========
   Added support for Merchant Verification Value (MVV) in BM 62.20
@@ -42,10 +69,10 @@
   Dropped support for BM60.92, scheme reference data
 0.1.10
 ==========
-  Updated bins mapping on new latest ExactBins DB 
+  Updated bins mapping on new latest ExactBins DB
 0.1.9
 ==========
-  Added some Maestro bins to the bins mapping 
+  Added some Maestro bins to the bins mapping
 0.1.8
 ==========
   Added 2 series bin for Mastercard
