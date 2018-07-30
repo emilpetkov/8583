@@ -288,4 +288,9 @@ module ISO8583
   LLL_SUBFIELD_BMP_60 = Field.new
   LLL_SUBFIELD_BMP_60.length = LLL_EBCDIC
   LLL_SUBFIELD_BMP_60.codec = Subfield_Ebcdic_Codec
+
+  # 3 bytes EBCDIC length, subfield
+  LLL_EBCDIC_BMP_61 = Field.new
+  LLL_EBCDIC_BMP_61.length = LLL_EBCDIC
+  LLL_EBCDIC_BMP_61.codec = EBCDIC_Codec
 end

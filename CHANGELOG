@@ -1,3 +1,6 @@
+0.3.8
+==========
+  Added support for BMP 61
 0.3.7
 ==========
   Replaced Fixnum with Integer
