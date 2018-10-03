@@ -40,7 +40,7 @@ module ISO8583
 
     case card_brand
     when VISA
-      BMP61_visa_string_id2subfield[:card_level_results].subfield_length = params_hashtable[:card_level_results].length
+      BMP61_visa_string_id2subfield[:card_level_results].subfield_length = params_hashtable[:card_level_results].length if params_hashtable[:card_level_results]
       serialize_fixed_subfields(61, BMP61_visa_string_id2subfield, params_hashtable, message)
     when MASTER, MAESTRO
       BMP61_mastercard_string_id2subfield[:banknet_reference].subfield_length = params_hashtable[:banknet_reference].length
