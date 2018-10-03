@@ -38,7 +38,7 @@ module ISO8583
   BMP61_Codec.encoder = lambda { |params_hashtable, message| serialize_bmp61_subfields(params_hashtable, message) }
   BMP61_Codec.decoder = lambda { |raw_params, message|       deserialize_bmp61_subfields(raw_params, message)     }
 
-  def self.serialize_bmp61_subfields(params_hashtable, message = nil)
+  def self.serialize_bmp61_subfields(params_hashtable, message)
     card_brand = credit_card_brand(message[2]).downcase # field 2 is PAN
 
     return log_unknown_card_brand_for(card_brand, true) unless SUPPORTED_CARD_BRANDS.include?(card_brand)
@@ -52,7 +52,7 @@ module ISO8583
     end
   end
 
-  def self.deserialize_bmp61_subfields(raw_params, message = nil)
+  def self.deserialize_bmp61_subfields(raw_params, message)
     decoded_params = EBCDIC_Codec.decode(raw_params)
     card_brand     = credit_card_brand(message[2]).downcase # field 2 is PAN
 
