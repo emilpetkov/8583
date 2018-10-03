@@ -1,8 +1,11 @@
 module ISO8583
 
-  VISA    = 'visa'.freeze
-  MASTER  = 'master'.freeze
-  MAESTRO = 'intl maestro'.freeze
+  VISA                       = 'visa'.freeze
+  MASTER                     = 'master'.freeze
+  MAESTRO                    = 'intl maestro'.freeze
+  SUPPORTED_CARD_BRANDS      = [VISA, MASTER, MAESTRO].freeze
+  VISA_FIXED_PARAMS_LENGTH   = 20.freeze
+  MASTER_FIXED_PARAMS_LENGTH = 3.freeze
 
   # Omnipay specifics
   F61_string_id2subfield  = Hash.new
@@ -36,19 +39,16 @@ module ISO8583
   BMP61_Codec.decoder = lambda { |raw_params, message|       deserialize_bmp61_subfields(raw_params, message)     }
 
   def self.serialize_bmp61_subfields(params_hashtable, message = nil)
-    card_brand     = credit_card_brand(message[2]).downcase # field 2 is PAN
+    card_brand = credit_card_brand(message[2]).downcase # field 2 is PAN
 
-    case card_brand
-    when VISA
+    return log_unknown_card_brand_for(card_brand, true) unless SUPPORTED_CARD_BRANDS.include?(card_brand)
+
+    if card_brand == VISA
       BMP61_visa_string_id2subfield[:card_level_results].subfield_length = params_hashtable[:card_level_results].length if params_hashtable[:card_level_results]
       serialize_fixed_subfields(61, BMP61_visa_string_id2subfield, params_hashtable, message)
-    when MASTER, MAESTRO
+    else
       BMP61_mastercard_string_id2subfield[:banknet_reference].subfield_length = params_hashtable[:banknet_reference].length
       serialize_fixed_subfields(61, BMP61_mastercard_string_id2subfield, params_hashtable, message)
-    else
-      error_message = "don't know how to decode BMP61 for card brand #{card_brand}, so leaving the other fields empty"
-      puts error_message
-      return 'card_brand unknown'
     end
   end
 
@@ -56,19 +56,24 @@ module ISO8583
     decoded_params = EBCDIC_Codec.decode(raw_params)
     card_brand     = credit_card_brand(message[2]).downcase # field 2 is PAN
 
-    case card_brand
-    when VISA
-      BMP61_visa_string_id2subfield[:card_level_results].subfield_length = decoded_params.length - 20
+    return log_unknown_card_brand_for(card_brand) unless SUPPORTED_CARD_BRANDS.include?(card_brand)
+
+    if card_brand == VISA
+      BMP61_visa_string_id2subfield[:card_level_results].subfield_length = decoded_params.length - VISA_FIXED_PARAMS_LENGTH
       deserialize_fixed_subfields(61, BMP61_visa_string_id2subfield, decoded_params, message)
-    when MASTER, MAESTRO
-      BMP61_mastercard_string_id2subfield[:banknet_reference].subfield_length = decoded_params.length - 3
-      deserialize_fixed_subfields(61, BMP61_mastercard_string_id2subfield, decoded_params, message)
     else
-      result_hash = Hash.new
-      result_hash[:error] = "don't know how to decode BMP61 for card brand #{card_brand}, so leaving the other fields empty"
-      puts result_hash[:error]
-      return result_hash
+      BMP61_mastercard_string_id2subfield[:banknet_reference].subfield_length = decoded_params.length - MASTER_FIXED_PARAMS_LENGTH
+      deserialize_fixed_subfields(61, BMP61_mastercard_string_id2subfield, decoded_params, message)
     end
+  end
+
+  def self.log_unknown_card_brand_for(card_brand, message_only = false)
+    error_message = "don't know how to decode BMP61 for card brand #{card_brand}, so leaving the other fields empty"
+    p error_message
+
+    return 'card_brand unknown' if message_only
+
+    { error: error_message }
   end
 end
 
