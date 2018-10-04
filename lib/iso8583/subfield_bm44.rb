@@ -59,7 +59,6 @@ module ISO8583
       # the length of the last (third) field (:mastercard_banknet_additional) is the rest of raw data: first field is 1 byte, the second is 12 bytes
       my_F44_mastercard_string_id2subfield[:mastercard_banknet_additional].subfield_length = raw.length - 12 - 1
 
-
       deserialize_fixed_subfields(44, my_F44_mastercard_string_id2subfield, raw, message)
     when 'visa'
       my_F44_visa_string_id2subfield = F44_visa_string_id2subfield.dup
