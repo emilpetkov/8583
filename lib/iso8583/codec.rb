@@ -13,7 +13,7 @@ module ISO8583
   # your own Codec sooner or later. The codecs used by Field instances are
   # typically instances of Codec, it may or may not be usefull to subclass
   # Codec.
-  # 
+  #
   # Say, for example, a text field needs to be encoded in EBCDIC in the
   # message, this is how a corresponding codec would be constructed:
   #
@@ -42,40 +42,54 @@ module ISO8583
   # See also: Field, link:files/lib/fields_rb.html
   #
   # The following codecs are already implemented:
-  # [+ASCII_Number+]      encodes either a Number or String representation of 
-  #                       a number to the ASCII represenation of the number, 
+  # [+ASCII_Number+]      encodes either a Number or String representation of
+  #                       a number to the ASCII represenation of the number,
   #                       decodes ASCII  numerals to a number
   # [+A_Codec+]           passes through ASCII string checking they conform to [A-Za-z]
-  #                       during encoding, no validity check during decoding. 
+  #                       during encoding, no validity check during decoding.
   # [+AN_Codec+]          passes through ASCII string checking they conform to [A-Za-z0-9]
-  #                       during encoding, no validity check during decoding. 
-  # [+ANP_Codec+]         passes through ASCII string checking they conform to [A-Za-z0-9 ] 
-  #                       during encoding, no validity check during decoding. 
+  #                       during encoding, no validity check during decoding.
+  # [+ANP_Codec+]         passes through ASCII string checking they conform to [A-Za-z0-9 ]
+  #                       during encoding, no validity check during decoding.
   # [+ANS_Codec+]         passes through ASCII string checking they conform to [\x20-\x7E]
   #                       during encoding, no validity check during decoding.
   # [+Null_Codec+]        passes anything along untouched.
   # [<tt>Track2</tt>]     rudimentary check that string conforms to Track2
-  # [+MMDDhhmmssCodec+]   encodes Time, Datetime or String to the described date format, checking 
-  #                       that it is a valid date. Decodes to a DateTime instance, decoding and 
+  # [+MMDDhhmmssCodec+]   encodes Time, Datetime or String to the described date format, checking
+  #                       that it is a valid date. Decodes to a DateTime instance, decoding and
   #                       encoding perform validity checks!
-  # [+YYMMDDhhmmssCodec+] encodes Time, Datetime or String to the described date format, checking 
-  #                       that it is a valid date. Decodes to a DateTime instance, decoding and 
+  # [+YYMMDDhhmmssCodec+] encodes Time, Datetime or String to the described date format, checking
+  #                       that it is a valid date. Decodes to a DateTime instance, decoding and
   #                       encoding perform validity checks!
-  # [+YYMMCodec+]         encodes Time, Datetime or String to the described date format (exp date), 
+  # [+YYMMCodec+]         encodes Time, Datetime or String to the described date format (exp date),
   #                       checking that it is a valid date. Decodes to a DateTime instance, decoding
   #                       and encoding perform validity checks!
   #
   class Codec
     attr_accessor :encoder
     attr_accessor :decoder
+#    def decode(raw)
+#      decoder.call(raw)
+#    end
 
-    def decode(raw)
-      decoder.call(raw)
+    def decode(raw, message=nil)
+      if( message )
+        decoder.call(raw, message)
+      else
+        decoder.call(raw)
+      end
     end
 
-    # length is either a fixnum or a lenth encoder.
-    def encode(value)
-      encoder.call(value)
+    # length is either a integer or a lenth encoder.
+#    def encode(value)
+#      encoder.call(value)
+#    end
+    def encode(value, message=nil)
+      if( message )
+        encoder.call(value, message)
+      else
+        encoder.call(value)
+      end
     end
   end
 
@@ -94,9 +108,13 @@ module ISO8583
   PASS_THROUGH_DECODER = lambda{|str|
     str.strip # remove padding
   }
-  
+
   NO_MODIFICATIONS_DECODER = lambda { |str| str }
-  
+
+  No_change_codec = Codec.new
+  No_change_codec.encoder = ->(str) { str }
+  No_change_codec.decoder = ->(str) { str }
+
   # Takes a number or str representation of a number and BCD encodes it, e.g.
   # "1234" => "\x12\x34"
   # 3456   => "\x34\x56"
@@ -109,27 +127,40 @@ module ISO8583
     raise ISO8583Exception.new("Invalid value: #{val} must be numeric!") unless val =~ /^[0-9]*$/
     [val].pack("H*")
   }
-  Packed_Number.decoder = lambda{|encoded|
-    d = encoded.unpack("H*")[0].to_i
+  Packed_Number.decoder = lambda {|encoded|
+    encoded.unpack("H*")[0].to_i
+  }
+
+  # Packed number codec, without any additional manipulation as the one above.
+  # If the value is odd we need to add a HEX value F, HOWEVER THIS NEEDS TO HAPPEN
+  # AFTER THE ENCODING!!!. Check field.rb
+  Packed_Number_Strict = Codec.new
+  Packed_Number_Strict.encoder = lambda { |val|
+    val = val.to_s
+    raise ISO8583Exception.new("Invalid value: #{val} must be numeric!") unless val =~ /^[0-9]*$/
+    [val].pack("H*")
+  }
+  Packed_Number_Strict.decoder = lambda {|encoded|
+    encoded.unpack("H*")[0].to_i
   }
 
   A_Codec = Codec.new
-  A_Codec.encoder = lambda{|str|
+  A_Codec.encoder = lambda {|str|
     raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-z]") unless str =~ /^[A-Za-z]*$/
     str
   }
   A_Codec.decoder = PASS_THROUGH_DECODER
 
   AN_Codec = Codec.new
-  AN_Codec.encoder = lambda{|str|
-    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-y0-9]") unless str =~ /^[A-Za-z0-9]*$/
+  AN_Codec.encoder = lambda {|str|
+    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-z0-9]") unless str =~ /^[A-Za-z0-9]*$/
     str
   }
   AN_Codec.decoder = PASS_THROUGH_DECODER
 
   ANP_Codec = Codec.new
   ANP_Codec.encoder = lambda{|str|
-    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-y0-9 ]") unless str =~ /^[A-Za-z0-9 ]*$/
+    raise ISO8583Exception.new("Invalid value: #{str} must be [A-Za-z0-9 ]") unless str =~ /^[A-Za-z0-9 ]*$/
     str
   }
   ANP_Codec.decoder = PASS_THROUGH_DECODER
@@ -147,7 +178,7 @@ module ISO8583
   }
   Null_Codec.decoder = lambda {|str|
     str.gsub(/\000*$/, '')
-  } 
+  }
 
   Track2 = Codec.new
   Track2.encoder = lambda{|track2|
@@ -164,7 +195,7 @@ module ISO8583
   }
   Track2.decoder = PASS_THROUGH_DECODER
 
-  def self._date_codec(fmt) 
+  def self._date_codec(fmt)
     c = Codec.new
     c.encoder = lambda {|date|
       enc = case date
@@ -177,7 +208,7 @@ module ISO8583
               rescue
                 raise ISO8583Exception.new("Invalid format encoding: #{date}, must be #{fmt}.")
               end
-            else  
+            else
               raise ISO8583Exception.new("Don't know how to encode: #{date.class} to a time.")
             end
       return enc
@@ -200,4 +231,35 @@ module ISO8583
   # codec patch
   HHMMSSCodec       = _date_codec("%H%M%S")
   MMDDCodec         = _date_codec("%m%d")
+
+  Binary_Codec = Codec.new
+  Binary_Codec.encoder = -> (str) {
+    ISO8583.hex2b(str)
+  }
+  Binary_Codec.decoder = -> (bytes) {
+    ISO8583.b2hex(bytes)
+  }
+
+  # Why do we need two codecs? EBCDIC is used for both length encryption
+  # as well as payload encryption. Length must always be cast to integer so the parse logic in
+  # field.rb can actually work (don't even think about trying to change it, you are in a world of hurt).
+  # Regular payload must remain properly decoded, not cast to integer, as this gives funny results. Passing
+  # extra arguments and adding additional if-else checks is ugly and cumbersome.
+  Main_EBCDIC_Encoder = -> (ascii_str) {
+    ascii_str = ascii_str.to_s
+    raise ISO8583Exception.new("#{ascii_str} must be a valid string") unless ascii_str.is_a?(String)
+    ISO8583.ascii2ebcdic(ascii_str)
+  }
+
+  EBCDIC_Codec = Codec.new
+  EBCDIC_Codec.encoder = Main_EBCDIC_Encoder
+  EBCDIC_Codec.decoder = -> (ebcdic_str) {
+    ISO8583.ebcdic2ascii(ebcdic_str)
+  }
+
+  EBCDIC_Length_Codec = Codec.new
+  EBCDIC_Length_Codec.encoder = Main_EBCDIC_Encoder
+  EBCDIC_Length_Codec.decoder = -> (ebcdic_str) {
+    ISO8583.ebcdic2ascii(ebcdic_str).to_i
+  }
 end

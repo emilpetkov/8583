@@ -1,7 +1,7 @@
 # Copyright 2009 by Tim Becker (tim.becker@kuriostaet.de)
 # MIT License, for details, see the LICENSE file accompaning
 # this distribution
-
+require 'base64'
 module ISO8583
 
   # general utilities
@@ -15,6 +15,7 @@ module ISO8583
     r = byte_string.unpack("H*")[0]
     r.length > 1 ? r : "  "
   end
+  module_function :b2hex
 
   #
   # Convert a String containing hex data to
@@ -28,14 +29,28 @@ module ISO8583
     raise ISO8583Exception.new("Uneven number of Hex chars #{hex_string}") unless ( (string.length % 2) == 0)
     [string].pack("H*")
   end
+  module_function :hex2b
+
+  def base642binary(base64_string)
+    base = ::Base64.strict_decode64(base64_string)
+    base.unpack('B*').first
+  end
+  module_function :base642binary
+
+  def binary2base64(binary_string)
+    raw = [binary_string].pack("B*").first
+    ::Base64.strict_encode64(raw)
+  end
+  module_function :binary2base64
 
   def _conv(str, mapping)
     _str = ""
     str.each_byte{|byte|
-      _str << mapping[byte]
+      _str << [mapping[byte]].pack("C")
     }
     _str
   end
+  module_function :_conv
 
   #
   # Convert a String of ASCII chars to EBCDIC
@@ -43,6 +58,7 @@ module ISO8583
   def ascii2ebcdic(ascii)
     _conv(ascii, US_ASCII2IBM037)
   end
+  module_function :ascii2ebcdic
 
   #
   # Convert an EBCDIC String to ASCII
@@ -50,6 +66,7 @@ module ISO8583
   def ebcdic2ascii(ebcdic)
     _conv(ebcdic, IBM0372US_ASCII)
   end
+  module_function :ebcdic2ascii
 
   # The charsets supported by iconv aren't guranteed. At the very least MACs don't support ebcdic,
   # so providing rudimentary mappings here.

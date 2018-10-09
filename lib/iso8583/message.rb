@@ -1,7 +1,6 @@
 # Copyright 2009 by Tim Becker (tim.becker@kuriostaet.de)
 # MIT License, for details, see the LICENSE file accompaning
 # this distribution
-
 module ISO8583
 
   # The class `Message` defines functionality to describe classes
@@ -106,22 +105,26 @@ module ISO8583
   # Most of the work in implementing a new set of message type lays in
   # figuring out the correct fields to use defining the Message class via
   # bmp.
-  #    
+  #
   class Message
 
     # The value of the MTI (Message Type Indicator) of this message.
-    attr_reader :mti 
-    
+    attr_reader :mti
+
     # ISO8583 allows hex or binary bitmap, so it should be configurable
     attr_reader :use_hex_bitmap
-    
+
+    attr_reader :parsed_raw_values
+    attr_reader :values
+
     # Instantiate a new instance of this type of Message
-    # optionally specifying an mti. 
+    # optionally specifying an mti.
     def initialize(mti = nil, use_hex_bitmap = false)
       # values is an internal field used to collect all the
       # bmp number | bmp name | field en/decoders | values
       # which are set in this message.
       @values = {}
+      @parsed_raw_values = {}
       @use_hex_bitmap = use_hex_bitmap
       self.mti = mti if mti
     end
@@ -142,7 +145,7 @@ module ISO8583
       num, name = _get_mti_definition(value)
       @mti = num
     end
-    
+
     # Set a field in this message, `key` is either the
     # bmp number or it's name.
     # ===Example
@@ -153,7 +156,7 @@ module ISO8583
     def []=(key, value)
       bmp_def              = _get_definition key
       bmp_def.value        = value
-      @values[bmp_def.bmp] = bmp_def 
+      @values[bmp_def.bmp] = bmp_def
     end
 
     # Retrieve the decoded value of the contents of a bitmap
@@ -173,8 +176,11 @@ module ISO8583
     # Retrieve the byte representation of the bitmap.
     def to_b
       raise ISO8583Exception.new "no MTI set!" unless mti
-      mti_enc = self.class._mti_format.encode(mti)
-      mti_enc << _body.join
+      mti_enc = self.class._mti_format.encode(mti, self)
+      # Added the next two lines from the original gem
+      str_body="".force_encoding('ASCII-8BIT')
+      _body.map { |b| str_body += b.force_encoding('ASCII-8BIT') }
+      mti_enc << str_body
     end
 
     # Returns a nicely formatted representation of this
@@ -189,23 +195,31 @@ module ISO8583
 
       @values.keys.sort.each{|bmp_num|
         _bmp = @values[bmp_num]
-        str += ("%03d %#{_max_name}s : %s\n" % [bmp_num, _bmp.name, _bmp.value])
+        value_to_show = _bmp.value
+        if( value_to_show.is_a?( Hash ) )
+          value_to_show = value_to_show.map{|k,v| "#{k}='#{v}'"}.join(' & ')
+        end
+        str += ("%03d %#{_max_name}s : %s\n" % [bmp_num, _bmp.name, value_to_show ])
       }
       str
+    end
+
+    def raw_value( key )
+      @parsed_raw_values[ key ]
     end
 
 
     # METHODS starting with an underscore are meant for
     # internal use only ...
-    
+
     # Returns an array of two byte arrays:
     # [bitmap_bytes, message_bytes]
     def _body
       bitmap  = Bitmap.new
-      message = ""
+      message = "".force_encoding('ASCII-8BIT')
       @values.keys.sort.each do |bmp_num|
         bitmap.set(bmp_num)
-        enc_value = @values[bmp_num].encode
+        enc_value = @values[bmp_num].encode( self )
         message << enc_value
       end
       [ use_hex_bitmap ? bitmap.to_hex : bitmap.to_bytes, message ]
@@ -234,7 +248,7 @@ module ISO8583
 
     class << self
 
-      # Defines how the message type indicator is encoded into bytes. 
+      # Defines how the message type indicator is encoded into bytes.
       # ===Params:
       # * field    : the decoder/encoder for the MTI
       # * opts     : the options to pass to this field
@@ -254,10 +268,10 @@ module ISO8583
         _handle_opts(f, opts)
         @mti_format = f
       end
-      
+
       # Defines the message types allowed for this type of message and
       # gives them names
-      # 
+      #
       # === Example
       #    class MyMessage < Message
       #      (...)
@@ -289,8 +303,8 @@ module ISO8583
       #      (...)
       #    end
       #
-      # creates a class MyMessage that allows for a bitmap 2 which 
-      # is named "PAN" and encoded by an LLVAR_N Field. The maximum 
+      # creates a class MyMessage that allows for a bitmap 2 which
+      # is named "PAN" and encoded by an LLVAR_N Field. The maximum
       # length of the value is 19. This class may be used as follows:
       #
       #    mes = MyMessage.new
@@ -303,7 +317,7 @@ module ISO8583
         field.name = name
         field.bmp  = bmp
         _handle_opts(field, opts) if opts
-        
+
         bmp_def = BMP.new bmp, name, field
 
         @defs[bmp]  = bmp_def
@@ -341,21 +355,30 @@ module ISO8583
           # @values[bmp] = bmp_def
         }
       end
-      
+
       # Parse the bytes `str` returning a message of the defined type.
       def parse(str, use_hex_bitmap = false)
+        str = str.force_encoding('ASCII-8BIT')
         message = self.new(nil, use_hex_bitmap)
-        message.mti, rest = _mti_format.parse(str)
+        message.mti, rest = _mti_format.parse(str, message)
         bmp, rest = Bitmap.parse(rest, use_hex_bitmap)
         bmp.each { |bit|
           next if bit == 1
           bmp_def      = _definitions[bit]
-          value, rest  = bmp_def.field.parse(rest)
+          if bmp_def && bmp_def.respond_to?('field')
+              if( bmp_def.field.bmp >= 999 )
+                next
+              end
+              value, rest, raw = bmp_def.field.parse_ex(rest, message)
+              message.parsed_raw_values[bit] = raw
+          else
+            raise ISO8583Exception.new( "bit mask defined the use of element \##{bit}, but in the ISO8583::Message class, used it is not defined for that bit number" )
+          end
           message[bit] = value
         }
         message
       end
-      
+
       # access the mti definitions applicable to the Message
       #
       # returns a pair of hashes containing:
@@ -367,7 +390,7 @@ module ISO8583
       def _mti_definitions
         [@mtis_v, @mtis_n]
       end
-      
+
       # Access the field definitions of this class, this is a
       # hash containing [bmp_number, BMP] and [bitmap_name, BMP]
       # pairs.
@@ -416,8 +439,12 @@ module ISO8583
       @field = field
     end
 
-    def encode
-      field.encode(value)
+    def encode( message )
+#      if( field.extended_arguments )
+        field.encode(value, message)
+#      else
+#        field.encode(value)
+#      end
     end
   end
 
