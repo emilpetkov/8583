@@ -126,7 +126,7 @@ module ISO8583
         # subfield number
         number      = PAYNETICS_SUBFIELD_DEFINITIONS[name][:number]
         subelements = PAYNETICS_SUBFIELD_DEFINITIONS[name][:subelements]
-        if subelements.present? && data.is_a?(Hash)
+        if !subelements.nil? && !subelements.empty? && data.is_a?(Hash)
           data.each do |subelement_name, subelement_data|
             length            = number.length
             subelement_number = subelements[subelement_name][:number]
@@ -172,7 +172,7 @@ module ISO8583
         field_definition = PAYNETICS_SUBFIELD_DEFINITIONS.values.detect { |k, _v| k[:number].to_i == field_number }
 
         subelements = field_definition[:subelements]
-        if subelements.present?
+        if !subelements.nil? && !subelements.empty?
           data_index = 0
           sub_data = data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, data.length]
           while data_index < sub_data.length
