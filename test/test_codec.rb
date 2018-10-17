@@ -163,8 +163,9 @@ class FieldTest < Test::Unit::TestCase
     result = { ewallet_data: '12345678901234' }
     assert_equal result, F60_Codec.decode('0166512345678901234', '')
 
-    assert_equal "\xF0\xF0\xF8\xF8\xF7\xF0\xF0\xF3\xF0\xF1\xF1".force_encoding('ASCII-8BIT'), Subfield_Ebcdic_Codec.encode({ options: { disable_seq_number_check: '1' } }, '')
-    result = {"Options/Disable Seq Number Check"=>"1"}
-    assert_equal result, Subfield_Ebcdic_Codec.decode("\xF0\xF0\xF8\xF8\xF7\xF0\xF0\xF3\xF0\xF1\xF1".force_encoding('ASCII-8BIT'), '')
+    encoded_data = "\xF0\xF0\xF8\xF8\xF7\xF0\xF0\xF3\xF0\xF1\xF1"
+    result       = { 'Options/Disable Seq Number Check' => '1' }
+    assert_equal encoded_data.force_encoding('ASCII-8BIT'), Subfield_Ebcdic_Codec.encode({ options: { disable_seq_number_check: '1' } }, '')
+    assert_equal result, Subfield_Ebcdic_Codec.decode(encoded_data.force_encoding('ASCII-8BIT'), '')
   end
 end

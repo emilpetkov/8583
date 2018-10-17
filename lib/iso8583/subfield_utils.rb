@@ -127,19 +127,7 @@ module ISO8583
         number      = PAYNETICS_SUBFIELD_DEFINITIONS[name][:number]
         subelements = PAYNETICS_SUBFIELD_DEFINITIONS[name][:subelements]
         if !subelements.nil? && !subelements.empty? && data.is_a?(Hash)
-          data.each do |subelement_name, subelement_data|
-            length            = number.length
-            subelement_number = subelements[subelement_name][:number]
-            subelement_length = (subelement_number + subelement_data).length
-            serialized_string << "".force_encoding('ASCII-8BIT').tap do |enc_data_with_subelement|
-              # length of the subfield = subfield number length + subelement length + length of the subelement length /const 00X, X = subelement length/
-              enc_data_with_subelement << LLL_EBCDIC.encode(length + subelement_length + PAYNETICS_SUBFIELD_LENGTH_PREFIX, nil)
-              enc_data_with_subelement << LL_EBCDIC.encode(number, nil)
-              enc_data_with_subelement << LLL_EBCDIC.encode(subelement_length, nil)
-              enc_data_with_subelement << LL_EBCDIC.encode(subelement_number, nil)
-              enc_data_with_subelement << subelements[subelement_name][:codec].encode(subelement_data)
-            end
-          end
+          serialized_string << serialize_lll_ebcdic_subelement(subelements, data, number)
         else
           # Encode the length of subfield number + data in EBCDIC
           length = LLL_EBCDIC.encode((number + data).length, nil)
@@ -150,6 +138,25 @@ module ISO8583
           # Join the encoded length, encoded subfield number and actual data
           encoded_data = length + number + data
           serialized_string << encoded_data
+        end
+      end
+    end
+  end
+
+  def self.serialize_lll_ebcdic_subelement(subelements, data, number)
+    "".force_encoding('ASCII-8BIT').tap do |serialized_string|
+      data.each do |subelement_name, subelement_data|
+        length            = number.length
+        subelement_number = subelements[subelement_name][:number]
+        subelement_length = (subelement_number + subelement_data).length
+        serialized_string << "".force_encoding('ASCII-8BIT').tap do |encoded_data_with_subelement|
+          # length of the subfield = subfield number length + subelement length + length of the
+          # subelement length /const 00X, X = subelement length/
+          encoded_data_with_subelement << LLL_EBCDIC.encode(length + subelement_length + PAYNETICS_SUBFIELD_LENGTH_PREFIX, nil)
+          encoded_data_with_subelement << LL_EBCDIC.encode(number, nil)
+          encoded_data_with_subelement << LLL_EBCDIC.encode(subelement_length, nil)
+          encoded_data_with_subelement << LL_EBCDIC.encode(subelement_number, nil)
+          encoded_data_with_subelement << subelements[subelement_name][:codec].encode(subelement_data)
         end
       end
     end
@@ -173,19 +180,7 @@ module ISO8583
 
         subelements = field_definition[:subelements]
         if !subelements.nil? && !subelements.empty?
-          data_index = 0
-          sub_data = data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, data.length]
-          while data_index < sub_data.length
-            subelement_length     = ISO8583.ebcdic2ascii(sub_data[data_index...data_index + length_prefix]).to_i
-            subelement_data       = sub_data[(data_index + length_prefix)...(data_index + length_prefix + subelement_length)]
-            subelement_number     = ISO8583.ebcdic2ascii(subelement_data[0, PAYNETICS_SUBFIELD_NUMBER_LENGTH]).to_i
-            subelement_definition = subelements.values.detect { |k, _v| k[:number].to_i == subelement_number }
-            actual_data           = subelement_definition[:codec].decode(subelement_data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, subelement_data.length])
-
-            deserialized_fields["#{field_definition[:name]}/#{subelement_definition[:name]}"] = actual_data
-
-            data_index += actual_data.length + length_prefix + PAYNETICS_SUBFIELD_NUMBER_LENGTH
-          end
+          deserialize_lll_ebcdic_subelement(data, subelements, field_definition, deserialized_fields)
         else
           # Decode the payload with the proper codec
           actual_data = field_definition[:codec].decode(data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, data.length])
@@ -196,6 +191,23 @@ module ISO8583
         subfield_length = data.length + length_prefix
         index += subfield_length
       end
+    end
+  end
+
+  def self.deserialize_lll_ebcdic_subelement(raw_data, subelements, field_definition, deserialized_fields)
+    length_prefix = PAYNETICS_SUBFIELD_LENGTH_PREFIX
+    data_index    = 0
+    sub_data      = raw_data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, raw_data.length]
+    while data_index < sub_data.length
+      subelement_length     = ISO8583.ebcdic2ascii(sub_data[data_index...data_index + length_prefix]).to_i
+      subelement_data       = sub_data[(data_index + length_prefix)...(data_index + length_prefix + subelement_length)]
+      subelement_number     = ISO8583.ebcdic2ascii(subelement_data[0, PAYNETICS_SUBFIELD_NUMBER_LENGTH]).to_i
+      subelement_definition = subelements.values.detect { |k, _v| k[:number].to_i == subelement_number }
+      actual_data           = subelement_definition[:codec].decode(subelement_data[PAYNETICS_SUBFIELD_NUMBER_LENGTH, subelement_data.length])
+
+      deserialized_fields["#{field_definition[:name]}/#{subelement_definition[:name]}"] = actual_data
+
+      data_index += actual_data.length + length_prefix + PAYNETICS_SUBFIELD_NUMBER_LENGTH
     end
   end
 
