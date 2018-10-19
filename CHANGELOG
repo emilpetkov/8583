@@ -1,3 +1,6 @@
+0.4.2
+==========
+  Added support for disable sequence number check option in BMP 60.87.01 for Paynetics
 0.4.1
 ==========
   Added support for BMP61 subfields

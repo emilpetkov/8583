@@ -15,6 +15,13 @@ module ISO8583
     payment_facilitator_id:        { name: 'Payment Facilitator ID', number: '81', codec: EBCDIC_Codec },
     iso_id:                        { name: 'Independent Sales Organization', number: '82', codec: EBCDIC_Codec },
     sub_merchant_id:               { name: 'Sub Merchant ID', number: '83', codec: EBCDIC_Codec },
-    sub_merchant_address:          { name: 'Sub Merchant Address', number: '84', codec: EBCDIC_Codec }
+    sub_merchant_address:          { name: 'Sub Merchant Address', number: '84', codec: EBCDIC_Codec },
+    options:                       {
+      name:        'Options',
+      number:      '87',
+      subelements: {
+        disable_seq_number_check: { name: 'Disable Seq Number Check', number: '01', codec: EBCDIC_Codec }
+      }
+    }
   }
 end
