@@ -16,6 +16,13 @@ module ISO8583
     iso_id:                        { name: 'Independent Sales Organization', number: '82', codec: EBCDIC_Codec },
     sub_merchant_id:               { name: 'Sub Merchant ID', number: '83', codec: EBCDIC_Codec },
     sub_merchant_address:          { name: 'Sub Merchant Address', number: '84', codec: EBCDIC_Codec },
+    point_of_service_data:         {
+      name:        'Point of Service Data',
+      number:      '52',
+      subelements: {
+        cardholder_presence: { name: 'POS Operating Environment', number: '02', codec: EBCDIC_Codec }
+      }
+    },
     options:                       {
       name:        'Options',
       number:      '87',
