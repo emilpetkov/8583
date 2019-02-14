@@ -1,3 +1,7 @@
+0.4.8
+==========
+  Add BMP52 sf02 for Paynetics
+  Fix BMP61 subfields ebcdic serialization
 0.4.7
 ==========
   Updates the bin lists
