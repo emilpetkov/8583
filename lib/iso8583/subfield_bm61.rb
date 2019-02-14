@@ -43,12 +43,14 @@ module ISO8583
 
     return log_unknown_card_brand_for(card_brand, true) unless SUPPORTED_CARD_BRANDS.include?(card_brand)
 
+    params_hashtable_serialized = params_hashtable.deep_dup
+    params_hashtable_serialized.each { |key, value| params_hashtable_serialized[key] = EBCDIC_Codec.encode(value) }
     if card_brand == VISA
-      BMP61_visa_string_id2subfield[:card_level_results].subfield_length = params_hashtable[:card_level_results].length if params_hashtable[:card_level_results]
-      serialize_fixed_subfields(61, BMP61_visa_string_id2subfield, params_hashtable, message)
+      BMP61_visa_string_id2subfield[:card_level_results].subfield_length = params_hashtable_serialized[:card_level_results].length if params_hashtable_serialized[:card_level_results]
+      serialize_fixed_subfields(61, BMP61_visa_string_id2subfield, params_hashtable_serialized, message)
     else
-      BMP61_mastercard_string_id2subfield[:banknet_reference].subfield_length = params_hashtable[:banknet_reference].length
-      serialize_fixed_subfields(61, BMP61_mastercard_string_id2subfield, params_hashtable, message)
+      BMP61_mastercard_string_id2subfield[:banknet_reference].subfield_length = params_hashtable_serialized[:banknet_reference].length
+      serialize_fixed_subfields(61, BMP61_mastercard_string_id2subfield, params_hashtable_serialized, message)
     end
   end
 

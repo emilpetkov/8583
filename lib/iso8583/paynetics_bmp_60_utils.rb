@@ -20,7 +20,7 @@ module ISO8583
       name:        'Point of Service Data',
       number:      '52',
       subelements: {
-        cardholder_presence: { name: 'POS Operating Environment', number: '02', codec: EBCDIC_Codec }
+        cardholder_presence: { name: 'Cardholder Presence', number: '02', codec: EBCDIC_Codec }
       }
     },
     options:                       {
